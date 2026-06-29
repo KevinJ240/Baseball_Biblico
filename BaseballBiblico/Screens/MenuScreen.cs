@@ -22,14 +22,13 @@ public class MenuScreen
     public void Update()
     {
         if (btnJugar.IsClicked())
-        {
             NextScreen = GameScreenType.Game;
-        }
+
+        if (btnOpciones.IsClicked())
+            NextScreen = GameScreenType.Options;
 
         if (btnSalir.IsClicked())
-        {
-            Raylib.CloseWindow();
-        }
+            Environment.Exit(0);
     }
 
     public void Draw()
@@ -42,5 +41,10 @@ public class MenuScreen
         btnSalir.Draw();
 
         Raylib.DrawText("Version 0.1", 560, 650, 20, Color.Gray);
+    }
+
+    public void Reset()
+    {
+        NextScreen = GameScreenType.Menu;
     }
 }

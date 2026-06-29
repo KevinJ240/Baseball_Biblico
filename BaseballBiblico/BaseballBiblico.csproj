@@ -13,15 +13,29 @@
 
   <ItemGroup>
     <Folder Include="Assets\Images\" />
-    <Folder Include="Entities\" />
-    <Folder Include="Managers\" />
+    <Folder Include="Assets\Fonts\" />
+    <Folder Include="Assets\Preguntas\Double\" />
+    <Folder Include="Assets\Preguntas\Home Run\" />
+    <Folder Include="Assets\Preguntas\Triple\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\Fonts\Mr Lucky Clover.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Images\Campo_Baseball.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Images\Marcador.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Preguntas\Hit\Correctas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Preguntas\Hit\Preguntas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Preguntas\Hit\Respuesta.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

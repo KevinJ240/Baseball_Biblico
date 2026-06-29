@@ -8,5 +8,6 @@ namespace BaseballBiblico.Core;
 public enum GameScreenType
 {
     Menu,
-    Game
+    Game,
+    Options 
 }

@@ -1,5 +1,6 @@
 ﻿using Raylib_cs;
 using System.Numerics;
+using BaseballBiblico.Core;
 
 namespace BaseballBiblico.UI;
 
@@ -20,7 +21,7 @@ public class BaseButton
 
     public bool IsHovered()
     {
-        return Raylib.CheckCollisionPointCircle(Raylib.GetMousePosition(), Center, Radius);
+        return Raylib.CheckCollisionPointCircle(ScreenScaler.GetVirtualMouse(), Center, Radius);
     }
 
     public bool IsClicked()

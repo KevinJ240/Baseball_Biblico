@@ -5,8 +5,6 @@ namespace BaseballBiblico.UI;
 
 public class ScoreBoardPanel
 {
-    private Texture2D marcador;
-
     public int EquipoA { get; set; }
     public int EquipoB { get; set; }
     public int Inning { get; set; } = 1;
@@ -14,74 +12,129 @@ public class ScoreBoardPanel
     public int Outs { get; set; }
     public string Turno { get; set; } = "A";
 
-    private readonly Rectangle destino = new(25, 20, 1230, 150);
+    private readonly Rectangle board = new(25, 20, 1230, 150);
 
-    public ScoreBoardPanel()
-    {
-        marcador = Raylib.LoadTexture("Assets/Images/Marcador.png");
-    }
+    private readonly Color fondo = new(25, 25, 25, 255);
+    private readonly Color borde = new(85, 85, 85, 255);
+    private readonly Color rojoLed = new(255, 25, 18, 255);
+    private readonly Color texto = new(235, 235, 235, 255);
+    private readonly Color amarillo = new(255, 215, 0, 255);
 
     public void Draw()
     {
-        if (marcador.Id > 0)
-        {
-            Raylib.DrawTexturePro(
-                marcador,
-                new Rectangle(0, 0, marcador.Width, marcador.Height),
-                destino,
-                Vector2.Zero,
-                0,
-                Color.White
-            );
-        }
-        else
-        {
-            Raylib.DrawRectangleRec(destino, new Color(25, 25, 25, 255));
-            Raylib.DrawRectangleLinesEx(destino, 3, Color.Gray);
-        }
+        DrawBoardBase();
 
-        DrawLabels();
-        DrawNumbers();
-        DrawLights();
+        Rectangle leftPanel = new(board.X + 10, board.Y + 10, 380, board.Height - 20);
+        Rectangle centerPanel = new(board.X + 400, board.Y + 10, 430, board.Height - 20);
+        Rectangle rightPanel = new(board.X + 840, board.Y + 10, 380, board.Height - 20);
+
+        DrawTeamPanel(leftPanel, "EQUIPO A", EquipoA);
+        DrawCenterPanel(centerPanel);
+        DrawTeamPanel(rightPanel, "EQUIPO B", EquipoB);
+
+        DrawStrikePanel(leftPanel);
+        DrawOutPanel(rightPanel);
     }
 
-    private void DrawLabels()
+    private void DrawBoardBase()
     {
-        Raylib.DrawText("EQUIPO A", 95, 38, 28, Color.White);
-        Raylib.DrawText("INNING", 570, 38, 28, Color.White);
-        Raylib.DrawText("EQUIPO B", 965, 38, 28, Color.White);
+        Raylib.DrawRectangleRounded(board, 0.03f, 12, fondo);
+        Raylib.DrawRectangleRoundedLinesEx(board, 0.03f, 12, 4, borde);
 
-        Raylib.DrawText("STRIKE", 350, 130, 24, Color.White);
-        Raylib.DrawText("OUT", 820, 130, 24, Color.White);
+        Raylib.DrawLineEx(
+            new Vector2(board.X + 390, board.Y + 12),
+            new Vector2(board.X + 390, board.Y + board.Height - 12),
+            2,
+            borde
+        );
 
-        Raylib.DrawText($"TURNO: EQUIPO {Turno}", 535, 130, 22, Color.Gold);
+        Raylib.DrawLineEx(
+            new Vector2(board.X + 840, board.Y + 12),
+            new Vector2(board.X + 840, board.Y + board.Height - 12),
+            2,
+            borde
+        );
     }
 
-    private void DrawNumbers()
+    private void DrawTeamPanel(Rectangle rect, string title, int score)
     {
-        Color rojoLed = new(255, 30, 20, 255);
-
-        Raylib.DrawText(EquipoA.ToString(), 180, 70, 64, rojoLed);
-        Raylib.DrawText(Inning.ToString(), 605, 70, 64, rojoLed);
-        Raylib.DrawText(EquipoB.ToString(), 1045, 70, 64, rojoLed);
+        DrawCenteredText(title, rect, 16, 28, texto);
+        DrawCenteredText(score.ToString(), rect, 52, 58, rojoLed);
     }
 
-    private void DrawLights()
+    private void DrawCenterPanel(Rectangle rect)
     {
-        DrawLightGroup(450, 142, Strikes);
-        DrawLightGroup(875, 142, Outs);
+        DrawCenteredText("INNING", rect, 16, 28, texto);
+        DrawCenteredText(Inning.ToString(), rect, 52, 58, rojoLed);
+
+        string turnoText = $"TURNO: EQUIPO {Turno}";
+        int size = 22;
+        int w = Raylib.MeasureText(turnoText, size);
+        Raylib.DrawText(
+            turnoText,
+            (int)(rect.X + rect.Width / 2 - w / 2),
+            (int)(rect.Y + 105),
+            size,
+            amarillo
+        );
     }
 
-    private void DrawLightGroup(int startX, int y, int activeCount)
+    private void DrawStrikePanel(Rectangle leftPanel)
+    {
+        int labelSize = 24;
+        string label = "STRIKE";
+        int labelW = Raylib.MeasureText(label, labelSize);
+
+        int y = (int)(leftPanel.Y + 100);
+        int labelX = (int)(leftPanel.X + leftPanel.Width / 2 - 110);
+
+        Raylib.DrawText(label, labelX, y, labelSize, texto);
+
+        int lightsX = labelX + labelW + 25;
+        DrawLightGroup(lightsX, y + 13, Strikes);
+    }
+
+    private void DrawOutPanel(Rectangle rightPanel)
+    {
+        int labelSize = 24;
+        string label = "OUT";
+        int labelW = Raylib.MeasureText(label, labelSize);
+
+        int y = (int)(rightPanel.Y + 100);
+        int labelX = (int)(rightPanel.X + rightPanel.Width / 2 - 80);
+
+        Raylib.DrawText(label, labelX, y, labelSize, texto);
+
+        int lightsX = labelX + labelW + 25;
+        DrawLightGroup(lightsX, y + 13, Outs);
+    }
+
+    private void DrawLightGroup(int startX, int centerY, int activeCount)
     {
         for (int i = 0; i < 3; i++)
         {
-            Color color = i < activeCount
-                ? new Color(255, 0, 0, 255)
-                : new Color(35, 35, 35, 255);
+            int x = startX + i * 35;
 
-            Raylib.DrawCircle(startX + i * 35, y, 10, color);
-            Raylib.DrawCircleLines(startX + i * 35, y, 10, Color.Black);
+            Color lightColor = i < activeCount
+                ? new Color(255, 0, 0, 255)
+                : new Color(18, 18, 18, 255);
+
+            Raylib.DrawCircle(x, centerY, 11, new Color(5, 5, 5, 255));
+            Raylib.DrawCircle(x, centerY, 8, lightColor);
+            Raylib.DrawCircleLines(x, centerY, 11, Color.Black);
         }
     }
-} 
+
+    private void DrawCenteredText(string value, Rectangle rect, int yOffset, int fontSize, Color color)
+    {
+        int w = Raylib.MeasureText(value, fontSize);
+
+        Raylib.DrawText(
+            value,
+            (int)(rect.X + rect.Width / 2 - w / 2),
+            (int)(rect.Y + yOffset),
+            fontSize,
+            color
+        );
+    }
+}

@@ -1,10 +1,6 @@
 ﻿using Raylib_cs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using BaseballBiblico.Core;
 
 namespace BaseballBiblico.UI;
 
@@ -21,14 +17,15 @@ public class GameButton
 
     public bool IsClicked()
     {
-        Vector2 mouse = Raylib.GetMousePosition();
+        Vector2 mouse = ScreenScaler.GetVirtualMouse();
+
         return Raylib.CheckCollisionPointRec(mouse, Rect)
                && Raylib.IsMouseButtonPressed(MouseButton.Left);
     }
 
     public void Draw()
     {
-        Vector2 mouse = Raylib.GetMousePosition();
+        Vector2 mouse = ScreenScaler.GetVirtualMouse();
         bool hover = Raylib.CheckCollisionPointRec(mouse, Rect);
 
         Color buttonColor = hover ? Color.SkyBlue : Color.LightGray;
