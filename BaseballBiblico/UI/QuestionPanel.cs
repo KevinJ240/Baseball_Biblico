@@ -21,54 +21,76 @@ public class QuestionPanel
         Raylib.DrawRectangleRec(panel, Color.RayWhite);
         Raylib.DrawRectangleLinesEx(panel, 3, Color.Black);
 
-        DrawCentered("PREGUNTA", panel.Y + 30, 34, Color.Black);
+        DrawCentered("PREGUNTA", panel.Y + UILayout.QuestionTitleY, 34, Color.Black);
 
         Raylib.DrawLine(
             (int)(panel.X + 40),
-            (int)(panel.Y + 95),
+            (int)(panel.Y + UILayout.QuestionLineY),
             (int)(panel.X + panel.Width - 40),
-            (int)(panel.Y + 95),
+            (int)(panel.Y + UILayout.QuestionLineY),
             Color.LightGray
         );
 
-        Rectangle areaPregunta = new(panel.X + 50, panel.Y + 130, panel.Width - 100, 90);
+        Rectangle areaPregunta = new(
+            panel.X + UILayout.QuestionPaddingX,
+            panel.Y + UILayout.QuestionTextY,
+            panel.Width - (UILayout.QuestionPaddingX * 2),
+            UILayout.QuestionAreaHeight
+        );
+
         DrawWrappedCentered(preguntaTexto, areaPregunta, 22, Color.Black);
 
         if (!string.IsNullOrWhiteSpace(dificultad))
-            DrawCentered($"Dificultad: {dificultad}", panel.Y + 245, 22, Color.DarkBlue);
+        {
+            DrawCentered($"Dificultad: {dificultad}", panel.Y + UILayout.DifficultyY, 22, Color.DarkBlue);
+        }
 
         DrawAnswers(preguntaActual);
     }
 
     private void DrawAnswers(Pregunta pregunta)
     {
-        float botonW = 220;
-        float botonH = 58;
-        float espacioX = 35;
-        float espacioY = 25;
+        if (pregunta.Answers == null || pregunta.Answers.Length == 0)
+            return;
 
-        float totalW = botonW * 2 + espacioX;
-        float startX = panel.X + (panel.Width - totalW) / 2f;
+        int count = pregunta.Answers.Length;
 
-        float startY = panel.Y + 300;
+        float botonW = UILayout.AnswerButtonWidth;
+        float botonH = UILayout.AnswerButtonHeight;
+        float espacioX = UILayout.AnswerButtonSpaceX;
+        float espacioY = UILayout.AnswerButtonSpaceY;
 
-        Rectangle r1 = new(startX, startY, botonW, botonH);
-        Rectangle r2 = new(startX + botonW + espacioX, startY, botonW, botonH);
-        Rectangle r3 = new(startX, startY + botonH + espacioY, botonW, botonH);
-        Rectangle r4 = new(startX + botonW + espacioX, startY + botonH + espacioY, botonW, botonH);
+        float startY = panel.Y + UILayout.AnswerButtonStartY;
 
-        DrawAnswer(r1, GetAnswer(pregunta, 0));
-        DrawAnswer(r2, GetAnswer(pregunta, 1));
-        DrawAnswer(r3, GetAnswer(pregunta, 2));
-        DrawAnswer(r4, GetAnswer(pregunta, 3));
-    }
+        if (count == 2)
+        {
+            float totalW = botonW * 2 + espacioX;
+            float startX = panel.X + (panel.Width - totalW) / 2f;
 
-    private string GetAnswer(Pregunta pregunta, int index)
-    {
-        if (pregunta.Answers != null && pregunta.Answers.Length == 4)
-            return pregunta.Answers[index];
+            DrawAnswer(new Rectangle(startX, startY, botonW, botonH), pregunta.Answers[0]);
+            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH), pregunta.Answers[1]);
+        }
+        else if (count == 3)
+        {
+            float totalW = botonW * 2 + espacioX;
+            float startX = panel.X + (panel.Width - totalW) / 2f;
 
-        return "";
+            DrawAnswer(new Rectangle(startX, startY, botonW, botonH), pregunta.Answers[0]);
+            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH), pregunta.Answers[1]);
+
+            float centerX = panel.X + (panel.Width - botonW) / 2f;
+            DrawAnswer(new Rectangle(centerX, startY + botonH + espacioY, botonW, botonH), pregunta.Answers[2]);
+        }
+        else
+        {
+            float totalW = botonW * 2 + espacioX;
+            float startX = panel.X + (panel.Width - totalW) / 2f;
+
+            DrawAnswer(new Rectangle(startX, startY, botonW, botonH), pregunta.Answers[0]);
+            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH), pregunta.Answers[1]);
+            DrawAnswer(new Rectangle(startX, startY + botonH + espacioY, botonW, botonH), pregunta.Answers[2]);
+            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY + botonH + espacioY, botonW, botonH), pregunta.Answers[3]);
+        }
     }
 
     private void DrawAnswer(Rectangle rect, string text)
@@ -85,7 +107,8 @@ public class QuestionPanel
     private void DrawCentered(string text, float y, int fontSize, Color color)
     {
         Vector2 size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
-        float x = panel.X + panel.Width / 3f - size.X / 3f;
+        float x = panel.X + (panel.Width - size.X) / 2f + UILayout.TitleOffsetX;
+        y += UILayout.TitleOffsetY;
 
         Raylib.DrawTextEx(fuente, text, new Vector2(x, y), fontSize, 1, color);
     }
@@ -94,8 +117,14 @@ public class QuestionPanel
     {
         Vector2 size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
 
-        float x = rect.X + rect.Width / 3f - size.X / 2f;
-        float y = rect.Y + rect.Height / 2f - size.Y / 2f;
+        while (size.X > rect.Width - 20 && fontSize > 14)
+        {
+            fontSize--;
+            size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
+        }
+
+        float x = rect.X + (rect.Width - size.X) / 2f + UILayout.AnswerTextOffsetX;
+        float y = rect.Y + (rect.Height - size.Y) / 2f + UILayout.AnswerTextOffsetY;
 
         Raylib.DrawTextEx(fuente, text, new Vector2(x, y), fontSize, 1, color);
     }
@@ -106,13 +135,13 @@ public class QuestionPanel
 
         float lineHeight = fontSize + 8;
         float totalHeight = lines.Count * lineHeight;
-        float startY = area.Y + area.Height / 2f - totalHeight / 2f;
+        float startY = area.Y + (area.Height - totalHeight) / 2f;
 
         for (int i = 0; i < lines.Count; i++)
         {
             Vector2 size = Raylib.MeasureTextEx(fuente, lines[i], fontSize, 1);
-            float x = area.X + area.Width / 30f - size.X / 10f;
-            float y = startY + i * lineHeight;
+            float x = area.X + (area.Width - size.X) / 2f + UILayout.QuestionOffsetX;
+            float y = startY + i * lineHeight + UILayout.QuestionOffsetY;
 
             Raylib.DrawTextEx(fuente, lines[i], new Vector2(x, y), fontSize, 1, color);
         }
@@ -127,7 +156,7 @@ public class QuestionPanel
 
         foreach (string word in words)
         {
-            string test = string.IsNullOrWhiteSpace(current) ? word : current + " " + word;
+            string test = string.IsNullOrWhiteSpace(current) ? word : $"{current} {word}";
             Vector2 size = Raylib.MeasureTextEx(fuente, test, fontSize, 1);
 
             if (size.X > maxWidth && !string.IsNullOrWhiteSpace(current))
@@ -146,4 +175,70 @@ public class QuestionPanel
 
         return lines;
     }
+
+    public int GetClickedAnswer(Pregunta pregunta)
+    {
+        if (pregunta.Answers == null || pregunta.Answers.Length == 0)
+            return -1;
+
+        Vector2 mouse = ScreenScaler.GetVirtualMouse();
+
+        Rectangle[] rects = GetAnswerRectangles(pregunta.Answers.Length);
+
+        for (int i = 0; i < rects.Length; i++)
+        {
+            if (Raylib.CheckCollisionPointRec(mouse, rects[i]) &&
+                Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                return i + 1; // respuesta 1, 2, 3 o 4
+            }
+        }
+
+        return -1;
+    }
+
+    private Rectangle[] GetAnswerRectangles(int count)
+    {
+        float botonW = UILayout.AnswerButtonWidth;
+        float botonH = UILayout.AnswerButtonHeight;
+        float espacioX = UILayout.AnswerButtonSpaceX;
+        float espacioY = UILayout.AnswerButtonSpaceY;
+        float startY = panel.Y + UILayout.AnswerButtonStartY;
+
+        List<Rectangle> rects = new();
+
+        if (count == 2)
+        {
+            float totalW = botonW * 2 + espacioX;
+            float startX = panel.X + (panel.Width - totalW) / 2f;
+
+            rects.Add(new Rectangle(startX, startY, botonW, botonH));
+            rects.Add(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH));
+        }
+        else if (count == 3)
+        {
+            float totalW = botonW * 2 + espacioX;
+            float startX = panel.X + (panel.Width - totalW) / 2f;
+            float centerX = panel.X + (panel.Width - botonW) / 2f;
+
+            rects.Add(new Rectangle(startX, startY, botonW, botonH));
+            rects.Add(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH));
+            rects.Add(new Rectangle(centerX, startY + botonH + espacioY, botonW, botonH));
+        }
+        else
+        {
+            float totalW = botonW * 2 + espacioX;
+            float startX = panel.X + (panel.Width - totalW) / 2f;
+
+            rects.Add(new Rectangle(startX, startY, botonW, botonH));
+            rects.Add(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH));
+            rects.Add(new Rectangle(startX, startY + botonH + espacioY, botonW, botonH));
+            rects.Add(new Rectangle(startX + botonW + espacioX, startY + botonH + espacioY, botonW, botonH));
+        }
+
+        return rects.ToArray();
+    }
+
+
+
 }

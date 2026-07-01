@@ -24,8 +24,8 @@ public class QuestionManager
             {
                 Id = 0,
                 Text = $"No hay preguntas cargadas para {difficulty}.",
-                Answers = ["Respuesta 1", "Respuesta 2", "Respuesta 3", "Respuesta 4"],
-                CorrectAnswer = 1
+                Answers = Array.Empty<string>(),
+                CorrectAnswer = 0
             };
         }
 
@@ -61,7 +61,7 @@ public class QuestionManager
             string correctaLinea = RemoveNumberPrefix(correctas[i]);
 
             string[] opciones = respuestaLinea
-                .Split(',')
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim())
                 .ToArray();
 
@@ -69,6 +69,9 @@ public class QuestionManager
                 continue;
 
             if (!int.TryParse(correctaLinea, out int correcta))
+                continue;
+
+            if (correcta < 1 || correcta > opciones.Length)
                 continue;
 
             questionsByDifficulty[difficulty].Add(new Pregunta

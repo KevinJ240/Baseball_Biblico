@@ -3,6 +3,7 @@ using System.Numerics;
 using BaseballBiblico.UI;
 using BaseballBiblico.Managers;
 using BaseballBiblico.Entities;
+using BaseballBiblico.UI;
 
 namespace BaseballBiblico.Screens;
 
@@ -19,8 +20,8 @@ public class GameScreen
 
     private readonly Color colorPasto = new(73, 138, 44, 255);
 
-    private readonly Rectangle campoDestino = new(65, 215, 520, 520);
-    private readonly Rectangle panelPregunta = new(690, 220, 560, 480);
+    private readonly Rectangle campoDestino = UILayout.Field;
+    private readonly Rectangle panelPregunta = UILayout.QuestionPanel;
 
     private BaseButton btnHit;
     private BaseButton btnDoble;
@@ -82,6 +83,13 @@ public class GameScreen
         if (btnDoble.IsClicked()) SeleccionarDificultad("Doble");
         if (btnTriple.IsClicked()) SeleccionarDificultad("Triple");
         if (btnHomeRun.IsClicked()) SeleccionarDificultad("Home Run");
+
+        int respuestaSeleccionada = questionPanel.GetClickedAnswer(currentQuestion);
+
+        if (respuestaSeleccionada != -1)
+        {
+            ProcesarRespuesta(respuestaSeleccionada);
+        }
     }
 
     public void Draw()
@@ -127,4 +135,60 @@ public class GameScreen
         currentQuestion = questionManager.GetRandomQuestion(difficultyKey);
         pregunta = currentQuestion.Text;
     }
+
+    private void ProcesarRespuesta(int respuestaSeleccionada)
+    {
+        if (currentQuestion.CorrectAnswer == 0)
+            return;
+
+        if (respuestaSeleccionada == currentQuestion.CorrectAnswer)
+        {
+            SumarPunto();
+        }
+        else
+        {
+            scoreBoard.Strikes++;
+
+            if (scoreBoard.Strikes >= 3)
+            {
+                CambiarTurno();
+            }
+        }
+
+        LimpiarPregunta();
+    }
+
+    private void SumarPunto()
+    {
+        if (scoreBoard.Turno == "A")
+            scoreBoard.EquipoA++;
+        else
+            scoreBoard.EquipoB++;
+    }
+
+    private void CambiarTurno()
+    {
+        scoreBoard.Strikes = 0;
+        scoreBoard.Outs = 0;
+
+        if (scoreBoard.Turno == "A")
+        {
+            scoreBoard.Turno = "B";
+        }
+        else
+        {
+            scoreBoard.Turno = "A";
+            scoreBoard.Inning++;
+        }
+    }
+
+    private void LimpiarPregunta()
+    {
+        currentQuestion = new Pregunta();
+        pregunta = "Selecciona una base para recibir una pregunta.";
+        dificultadSeleccionada = "";
+    }
+
+
+
 }
