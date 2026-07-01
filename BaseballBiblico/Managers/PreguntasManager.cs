@@ -65,7 +65,7 @@ public class QuestionManager
                 .Select(x => x.Trim())
                 .ToArray();
 
-            if (opciones.Length != 4)
+            if (opciones.Length < 2 || opciones.Length > 4)
                 continue;
 
             if (!int.TryParse(correctaLinea, out int correcta))

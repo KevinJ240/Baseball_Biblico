@@ -19,13 +19,8 @@ public class GameScreen
 
     private readonly Color colorPasto = new(73, 138, 44, 255);
 
-    private readonly Rectangle campoDestino = new(90, 185, 540, 540);
-    private readonly Rectangle panelPregunta = new(720, 190, 520, 535);
-
-    private readonly Rectangle respuesta1 = new(760, 425, 440, 55);
-    private readonly Rectangle respuesta2 = new(760, 495, 440, 55);
-    private readonly Rectangle respuesta3 = new(760, 565, 440, 55);
-    private readonly Rectangle respuesta4 = new(760, 635, 440, 55);
+    private readonly Rectangle campoDestino = new(65, 215, 520, 520);
+    private readonly Rectangle panelPregunta = new(690, 220, 560, 480);
 
     private BaseButton btnHit;
     private BaseButton btnDoble;
@@ -33,6 +28,7 @@ public class GameScreen
     private BaseButton btnHomeRun;
 
     private ScoreBoardPanel scoreBoard;
+    private QuestionPanel questionPanel;
 
     public GameScreen()
     {
@@ -49,10 +45,35 @@ public class GameScreen
             Turno = "A"
         };
 
-        btnDoble = new BaseButton(new Vector2(campoDestino.X + campoDestino.Width * 0.50f, campoDestino.Y + campoDestino.Height * 0.14f), 35, "Doble", "Media");
-        btnTriple = new BaseButton(new Vector2(campoDestino.X + campoDestino.Width * 0.20f, campoDestino.Y + campoDestino.Height * 0.45f), 35, "Triple", "Dificil");
-        btnHit = new BaseButton(new Vector2(campoDestino.X + campoDestino.Width * 0.80f, campoDestino.Y + campoDestino.Height * 0.45f), 35, "Hit", "Facil");
-        btnHomeRun = new BaseButton(new Vector2(campoDestino.X + campoDestino.Width * 0.50f, campoDestino.Y + campoDestino.Height * 0.82f), 35, "Home Run", "Muy dificil");
+        questionPanel = new QuestionPanel(panelPregunta, fuente);
+
+        btnDoble = new BaseButton(
+            new Vector2(campoDestino.X + campoDestino.Width * 0.50f, campoDestino.Y + campoDestino.Height * 0.14f),
+            35,
+            "Doble",
+            "Media"
+        );
+
+        btnTriple = new BaseButton(
+            new Vector2(campoDestino.X + campoDestino.Width * 0.20f, campoDestino.Y + campoDestino.Height * 0.45f),
+            35,
+            "Triple",
+            "Dificil"
+        );
+
+        btnHit = new BaseButton(
+            new Vector2(campoDestino.X + campoDestino.Width * 0.80f, campoDestino.Y + campoDestino.Height * 0.45f),
+            35,
+            "Hit",
+            "Facil"
+        );
+
+        btnHomeRun = new BaseButton(
+            new Vector2(campoDestino.X + campoDestino.Width * 0.50f, campoDestino.Y + campoDestino.Height * 0.82f),
+            35,
+            "Home Run",
+            "Muy dificil"
+        );
     }
 
     public void Update()
@@ -69,7 +90,8 @@ public class GameScreen
 
         scoreBoard.Draw();
         DibujarCampo();
-        DibujarPanelPregunta();
+
+        questionPanel.Draw(currentQuestion, pregunta, dificultadSeleccionada);
     }
 
     private void DibujarCampo()
@@ -87,47 +109,6 @@ public class GameScreen
         btnDoble.Draw();
         btnTriple.Draw();
         btnHomeRun.Draw();
-    }
-
-    private void DibujarPanelPregunta()
-    {
-        Raylib.DrawRectangleRec(panelPregunta, Color.RayWhite);
-        Raylib.DrawRectangleLinesEx(panelPregunta, 3, Color.Black);
-
-        Raylib.DrawText("PREGUNTA", 900, 250, 34, Color.Black);
-        Raylib.DrawText(pregunta, 760, 320, 20, Color.Black);
-
-        if (!string.IsNullOrWhiteSpace(dificultadSeleccionada))
-            Raylib.DrawText($"Dificultad: {dificultadSeleccionada}", 850, 370, 24, Color.DarkBlue);
-
-        DibujarRespuesta(respuesta1, GetAnswerText(0));
-        DibujarRespuesta(respuesta2, GetAnswerText(1));
-        DibujarRespuesta(respuesta3, GetAnswerText(2));
-        DibujarRespuesta(respuesta4, GetAnswerText(3));
-    }
-
-    private string GetAnswerText(int index)
-    {
-        if (currentQuestion.Answers.Length == 4)
-            return currentQuestion.Answers[index];
-
-        return $"Respuesta {index + 1}";
-    }
-
-    private void DibujarRespuesta(Rectangle rect, string texto)
-    {
-        Vector2 mouse = Raylib.GetMousePosition();
-        bool hover = Raylib.CheckCollisionPointRec(mouse, rect);
-
-        Raylib.DrawRectangleRec(rect, hover ? Color.SkyBlue : Color.White);
-        Raylib.DrawRectangleLinesEx(rect, 2, Color.Black);
-
-        Vector2 medida = Raylib.MeasureTextEx(fuente, texto, 24, 1);
-
-        float x = rect.X + rect.Width / 2 - medida.X / 2;
-        float y = rect.Y + rect.Height / 2 - medida.Y / 2;
-
-        Raylib.DrawTextEx(fuente, texto, new Vector2(x, y), 24, 1, Color.Black);
     }
 
     private void SeleccionarDificultad(string jugada)
