@@ -16,7 +16,12 @@ public class QuestionPanel
         this.fuente = fuente;
     }
 
-    public void Draw(Pregunta preguntaActual, string preguntaTexto, string dificultad)
+    public void Draw(
+        Pregunta preguntaActual,
+        string preguntaTexto,
+        string dificultad,
+        bool mostrarResultado = false,
+        int respuestaSeleccionada = -1)
     {
         Raylib.DrawRectangleRec(panel, Color.RayWhite);
         Raylib.DrawRectangleLinesEx(panel, 3, Color.Black);
@@ -41,64 +46,59 @@ public class QuestionPanel
         DrawWrappedCentered(preguntaTexto, areaPregunta, 22, Color.Black);
 
         if (!string.IsNullOrWhiteSpace(dificultad))
-        {
             DrawCentered($"Dificultad: {dificultad}", panel.Y + UILayout.DifficultyY, 22, Color.DarkBlue);
-        }
 
-        DrawAnswers(preguntaActual);
+        if (preguntaActual.Id > 0 &&
+            preguntaActual.Answers != null &&
+            preguntaActual.Answers.Length > 0)
+        {
+            DrawAnswers(preguntaActual, mostrarResultado, respuestaSeleccionada);
+        }
     }
 
-    private void DrawAnswers(Pregunta pregunta)
+    private void DrawAnswers(Pregunta pregunta, bool mostrarResultado, int respuestaSeleccionada)
     {
-        if (pregunta.Answers == null || pregunta.Answers.Length == 0)
-            return;
+        Rectangle[] rects = GetAnswerRectangles(pregunta.Answers.Length);
 
-        int count = pregunta.Answers.Length;
-
-        float botonW = UILayout.AnswerButtonWidth;
-        float botonH = UILayout.AnswerButtonHeight;
-        float espacioX = UILayout.AnswerButtonSpaceX;
-        float espacioY = UILayout.AnswerButtonSpaceY;
-
-        float startY = panel.Y + UILayout.AnswerButtonStartY;
-
-        if (count == 2)
+        for (int i = 0; i < pregunta.Answers.Length; i++)
         {
-            float totalW = botonW * 2 + espacioX;
-            float startX = panel.X + (panel.Width - totalW) / 2f;
-
-            DrawAnswer(new Rectangle(startX, startY, botonW, botonH), pregunta.Answers[0]);
-            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH), pregunta.Answers[1]);
-        }
-        else if (count == 3)
-        {
-            float totalW = botonW * 2 + espacioX;
-            float startX = panel.X + (panel.Width - totalW) / 2f;
-
-            DrawAnswer(new Rectangle(startX, startY, botonW, botonH), pregunta.Answers[0]);
-            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH), pregunta.Answers[1]);
-
-            float centerX = panel.X + (panel.Width - botonW) / 2f;
-            DrawAnswer(new Rectangle(centerX, startY + botonH + espacioY, botonW, botonH), pregunta.Answers[2]);
-        }
-        else
-        {
-            float totalW = botonW * 2 + espacioX;
-            float startX = panel.X + (panel.Width - totalW) / 2f;
-
-            DrawAnswer(new Rectangle(startX, startY, botonW, botonH), pregunta.Answers[0]);
-            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY, botonW, botonH), pregunta.Answers[1]);
-            DrawAnswer(new Rectangle(startX, startY + botonH + espacioY, botonW, botonH), pregunta.Answers[2]);
-            DrawAnswer(new Rectangle(startX + botonW + espacioX, startY + botonH + espacioY, botonW, botonH), pregunta.Answers[3]);
+            DrawAnswer(
+                rects[i],
+                pregunta.Answers[i],
+                i + 1,
+                pregunta.CorrectAnswer,
+                respuestaSeleccionada,
+                mostrarResultado
+            );
         }
     }
 
-    private void DrawAnswer(Rectangle rect, string text)
+    private void DrawAnswer(
+        Rectangle rect,
+        string text,
+        int answerIndex,
+        int correctAnswer,
+        int selectedAnswer,
+        bool mostrarResultado)
     {
         Vector2 mouse = ScreenScaler.GetVirtualMouse();
         bool hover = Raylib.CheckCollisionPointRec(mouse, rect);
 
-        Raylib.DrawRectangleRec(rect, hover ? Color.SkyBlue : Color.White);
+        Color fondo = Color.White;
+
+        if (mostrarResultado)
+        {
+            if (answerIndex == correctAnswer)
+                fondo = new Color(90, 220, 120, 255); // verde
+            else
+                fondo = new Color(230, 90, 90, 255); // rojo
+        }
+        else if (hover)
+        {
+            fondo = Color.SkyBlue;
+        }
+
+        Raylib.DrawRectangleRec(rect, fondo);
         Raylib.DrawRectangleLinesEx(rect, 2, Color.Black);
 
         DrawTextInsideRect(text, rect, 22, Color.Black);
@@ -178,11 +178,10 @@ public class QuestionPanel
 
     public int GetClickedAnswer(Pregunta pregunta)
     {
-        if (pregunta.Answers == null || pregunta.Answers.Length == 0)
+        if (pregunta.Id <= 0 || pregunta.Answers == null || pregunta.Answers.Length == 0)
             return -1;
 
         Vector2 mouse = ScreenScaler.GetVirtualMouse();
-
         Rectangle[] rects = GetAnswerRectangles(pregunta.Answers.Length);
 
         for (int i = 0; i < rects.Length; i++)
@@ -190,7 +189,7 @@ public class QuestionPanel
             if (Raylib.CheckCollisionPointRec(mouse, rects[i]) &&
                 Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
-                return i + 1; // respuesta 1, 2, 3 o 4
+                return i + 1;
             }
         }
 
@@ -238,7 +237,4 @@ public class QuestionPanel
 
         return rects.ToArray();
     }
-
-
-
 }

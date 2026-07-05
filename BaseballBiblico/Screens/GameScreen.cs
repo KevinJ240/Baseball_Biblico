@@ -3,7 +3,6 @@ using System.Numerics;
 using BaseballBiblico.UI;
 using BaseballBiblico.Managers;
 using BaseballBiblico.Entities;
-using BaseballBiblico.UI;
 
 namespace BaseballBiblico.Screens;
 
@@ -13,7 +12,21 @@ public class GameScreen
     private Font fuente;
 
     private readonly QuestionManager questionManager = new();
-    private Pregunta currentQuestion = new();
+
+    private Pregunta currentQuestion = new()
+    {
+        Id = 0,
+        Text = "",
+        Answers = Array.Empty<string>(),
+        CorrectAnswer = 0
+    };
+
+    private bool mostrandoResultado = false;
+    private float tiempoResultado = 0f;
+    private int respuestaSeleccionada = -1;
+    private bool respuestaFueCorrecta = false;
+
+    private const float TIEMPO_MOSTRAR_RESULTADO = 2.0f;
 
     private string pregunta = "Selecciona una base para recibir una pregunta.";
     private string dificultadSeleccionada = "";
@@ -79,16 +92,29 @@ public class GameScreen
 
     public void Update()
     {
+        if (mostrandoResultado)
+        {
+            tiempoResultado += Raylib.GetFrameTime();
+
+            if (tiempoResultado >= TIEMPO_MOSTRAR_RESULTADO)
+            {
+                AplicarResultadoPendiente();
+                LimpiarPregunta();
+            }
+
+            return;
+        }
+
         if (btnHit.IsClicked()) SeleccionarDificultad("Hit");
         if (btnDoble.IsClicked()) SeleccionarDificultad("Doble");
         if (btnTriple.IsClicked()) SeleccionarDificultad("Triple");
         if (btnHomeRun.IsClicked()) SeleccionarDificultad("Home Run");
 
-        int respuestaSeleccionada = questionPanel.GetClickedAnswer(currentQuestion);
+        int respuesta = questionPanel.GetClickedAnswer(currentQuestion);
 
-        if (respuestaSeleccionada != -1)
+        if (respuesta != -1)
         {
-            ProcesarRespuesta(respuestaSeleccionada);
+            ProcesarRespuesta(respuesta);
         }
     }
 
@@ -99,7 +125,13 @@ public class GameScreen
         scoreBoard.Draw();
         DibujarCampo();
 
-        questionPanel.Draw(currentQuestion, pregunta, dificultadSeleccionada);
+        questionPanel.Draw(
+            currentQuestion,
+            pregunta,
+            dificultadSeleccionada,
+            mostrandoResultado,
+            respuestaSeleccionada
+        );
     }
 
     private void DibujarCampo()
@@ -136,12 +168,21 @@ public class GameScreen
         pregunta = currentQuestion.Text;
     }
 
-    private void ProcesarRespuesta(int respuestaSeleccionada)
+    private void ProcesarRespuesta(int respuesta)
     {
         if (currentQuestion.CorrectAnswer == 0)
             return;
 
-        if (respuestaSeleccionada == currentQuestion.CorrectAnswer)
+        respuestaSeleccionada = respuesta;
+        respuestaFueCorrecta = respuesta == currentQuestion.CorrectAnswer;
+
+        mostrandoResultado = true;
+        tiempoResultado = 0f;
+    }
+
+    private void AplicarResultadoPendiente()
+    {
+        if (respuestaFueCorrecta)
         {
             SumarPunto();
         }
@@ -154,8 +195,6 @@ public class GameScreen
                 CambiarTurno();
             }
         }
-
-        LimpiarPregunta();
     }
 
     private void SumarPunto()
@@ -184,11 +223,20 @@ public class GameScreen
 
     private void LimpiarPregunta()
     {
-        currentQuestion = new Pregunta();
+        currentQuestion = new Pregunta()
+        {
+            Id = 0,
+            Text = "",
+            Answers = Array.Empty<string>(),
+            CorrectAnswer = 0
+        };
+
         pregunta = "Selecciona una base para recibir una pregunta.";
         dificultadSeleccionada = "";
+
+        mostrandoResultado = false;
+        tiempoResultado = 0f;
+        respuestaSeleccionada = -1;
+        respuestaFueCorrecta = false;
     }
-
-
-
 }
