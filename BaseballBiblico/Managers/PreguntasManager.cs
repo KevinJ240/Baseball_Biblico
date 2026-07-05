@@ -5,6 +5,7 @@ namespace BaseballBiblico.Managers;
 public class QuestionManager
 {
     private readonly Dictionary<string, List<Pregunta>> questionsByDifficulty = new();
+    private readonly Dictionary<string, HashSet<int>> usedQuestionsByDifficulty = new();
     private readonly Random random = new();
 
     public QuestionManager()
@@ -17,20 +18,44 @@ public class QuestionManager
 
     public Pregunta GetRandomQuestion(string difficulty)
     {
-        if (!questionsByDifficulty.ContainsKey(difficulty) ||
-            questionsByDifficulty[difficulty].Count == 0)
-        {
-            return new Pregunta
-            {
-                Id = 0,
-                Text = $"No hay preguntas cargadas para {difficulty}.",
-                Answers = Array.Empty<string>(),
-                CorrectAnswer = 0
-            };
-        }
+        if (!HasQuestions(difficulty))
+            return EmptyQuestion($"No hay preguntas cargadas para {difficulty}.");
 
-        List<Pregunta> list = questionsByDifficulty[difficulty];
-        return list[random.Next(list.Count)];
+        EnsureUsedSet(difficulty);
+
+        List<Pregunta> disponibles = questionsByDifficulty[difficulty]
+            .Where(q => !usedQuestionsByDifficulty[difficulty].Contains(q.Id))
+            .ToList();
+
+        if (disponibles.Count == 0)
+            return EmptyQuestion($"Ya no hay preguntas disponibles para {difficulty}.");
+
+        Pregunta seleccionada = disponibles[random.Next(disponibles.Count)];
+        usedQuestionsByDifficulty[difficulty].Add(seleccionada.Id);
+
+        return seleccionada;
+    }
+
+    public Pregunta GetRandomQuestionExcept(string difficulty, int excludedId)
+    {
+        if (!HasQuestions(difficulty))
+            return EmptyQuestion($"No hay preguntas cargadas para {difficulty}.");
+
+        EnsureUsedSet(difficulty);
+
+        List<Pregunta> disponibles = questionsByDifficulty[difficulty]
+            .Where(q =>
+                q.Id != excludedId &&
+                !usedQuestionsByDifficulty[difficulty].Contains(q.Id))
+            .ToList();
+
+        if (disponibles.Count == 0)
+            return EmptyQuestion($"Ya no hay preguntas disponibles para {difficulty}.");
+
+        Pregunta seleccionada = disponibles[random.Next(disponibles.Count)];
+        usedQuestionsByDifficulty[difficulty].Add(seleccionada.Id);
+
+        return seleccionada;
     }
 
     private void LoadQuestions(string difficulty, string folderPath)
@@ -40,6 +65,7 @@ public class QuestionManager
         string correctasPath = Path.Combine(folderPath, "Correctas.txt");
 
         questionsByDifficulty[difficulty] = new List<Pregunta>();
+        usedQuestionsByDifficulty[difficulty] = new HashSet<int>();
 
         if (!File.Exists(preguntasPath) ||
             !File.Exists(respuestasPath) ||
@@ -63,6 +89,7 @@ public class QuestionManager
             string[] opciones = respuestaLinea
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
                 .ToArray();
 
             if (opciones.Length < 2 || opciones.Length > 4)
@@ -82,6 +109,29 @@ public class QuestionManager
                 CorrectAnswer = correcta
             });
         }
+    }
+
+    private bool HasQuestions(string difficulty)
+    {
+        return questionsByDifficulty.ContainsKey(difficulty) &&
+               questionsByDifficulty[difficulty].Count > 0;
+    }
+
+    private void EnsureUsedSet(string difficulty)
+    {
+        if (!usedQuestionsByDifficulty.ContainsKey(difficulty))
+            usedQuestionsByDifficulty[difficulty] = new HashSet<int>();
+    }
+
+    private Pregunta EmptyQuestion(string message)
+    {
+        return new Pregunta
+        {
+            Id = 0,
+            Text = message,
+            Answers = Array.Empty<string>(),
+            CorrectAnswer = 0
+        };
     }
 
     private string RemoveNumberPrefix(string line)
