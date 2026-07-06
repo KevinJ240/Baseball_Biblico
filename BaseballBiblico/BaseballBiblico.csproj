@@ -22,6 +22,12 @@
     <None Update="Assets\Fonts\Mr Lucky Clover.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Fonts\Nunito-VariableFont_wght.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Fonts\PatuaOne-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Images\Campo_Baseball.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

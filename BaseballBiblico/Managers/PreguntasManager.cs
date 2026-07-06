@@ -1,5 +1,5 @@
 ﻿using BaseballBiblico.Entities;
-
+using System.Text;
 namespace BaseballBiblico.Managers;
 
 public class QuestionManager
@@ -74,9 +74,9 @@ public class QuestionManager
             return;
         }
 
-        string[] preguntas = File.ReadAllLines(preguntasPath);
-        string[] respuestas = File.ReadAllLines(respuestasPath);
-        string[] correctas = File.ReadAllLines(correctasPath);
+        string[] preguntas = File.ReadAllLines(preguntasPath, Encoding.UTF8);
+        string[] respuestas = File.ReadAllLines(respuestasPath, Encoding.UTF8);
+        string[] correctas = File.ReadAllLines(correctasPath, Encoding.UTF8);
 
         int total = Math.Min(preguntas.Length, Math.Min(respuestas.Length, correctas.Length));
 

@@ -15,7 +15,7 @@ public class GameScreen
     private Font fuente;
 
     private readonly QuestionManager questionManager = new();
-    private BaseRunnerManager runnerManager;
+    private RunnerAnimationManager runnerManager;
 
     private Pregunta currentQuestion = new()
     {
@@ -60,13 +60,10 @@ public class GameScreen
     {
         campo = Raylib.LoadTexture("Assets/Images/Campo_Baseball.png");
         fichaAzul = Raylib.LoadTexture("Assets/Images/fichaAzul.png");
-       
         fichaRoja = Raylib.LoadTexture("Assets/Images/fichaRoja.png");
-        fuente = Raylib.LoadFontEx("Assets/Fonts/arial.ttf", 32, null, 0);
+        fuente = Raylib.LoadFontEx("Assets/Fonts/ari-bold.ttf", 32, null, 0);
 
-        runnerManager = new BaseRunnerManager();
-
-       
+        runnerManager = new RunnerAnimationManager(campoDestino);
 
         scoreBoard = new ScoreBoardPanel
         {
@@ -91,6 +88,22 @@ public class GameScreen
 
     public void Update()
     {
+        runnerManager.Update(Raylib.GetFrameTime());
+
+        if (!runnerManager.IsAnimating)
+        {
+            int carrerasPendientes = runnerManager.GetPendingRuns();
+
+            if (carrerasPendientes > 0)
+            {
+                if (scoreBoard.Turno == "A")
+                    scoreBoard.EquipoA += carrerasPendientes;
+                else
+                    scoreBoard.EquipoB += carrerasPendientes;
+            }
+        }
+
+
         if (mostrandoResultado)
         {
             tiempoResultado += Raylib.GetFrameTime();
@@ -242,12 +255,7 @@ public class GameScreen
 
     private void AvanzarCorredores()
     {
-        int carreras = runnerManager.AdvanceRunners(avancePendiente);
-
-        if (scoreBoard.Turno == "A")
-            scoreBoard.EquipoA += carreras;
-        else
-            scoreBoard.EquipoB += carreras;
+        runnerManager.AdvanceRunners(avancePendiente);
     }
 
     private void MarcarOut()
@@ -329,7 +337,7 @@ public class GameScreen
         );
 
         Texture2D fichaActual = scoreBoard.Turno == "A" ? fichaAzul : fichaRoja;
-        runnerManager.Draw(campoDestino, fichaActual);
+        runnerManager.Draw(fichaActual);
 
         btnHit.Draw();
         btnDoble.Draw();
