@@ -1,4 +1,50 @@
-1. Noé, Moisés, Abraham, Isaías
-2. 10, 12, 7, 14
-3. Goliat, Sansón, Saúl, Herodes
-4. Belén, Nazaret, Jerusalén, Jericó
+1. Abraham, Moisés, Noé, José
+2. Éxodo, Génesis, Mateo, Apocalipsis
+3. Daniel, Jonás, Pedro, Elías
+4. Una espada, Una lanza, Una honda, Un arco
+5. 5, 7, 10, 12
+6. Juan, Pedro, Jesús, Moisés
+7. María, Eva, Sara, Rut
+8. Judas Iscariote, Pedro, Tomás, Juan
+9. Nazaret, Jerusalén, Belén, Roma
+10. Pescador, Carpintero, Agricultor, Médico
+11. Sansón, David, Daniel, José
+12. Mar Muerto, Mar Rojo, Río Jordán, Mar de Galilea
+13. David, Saúl, Sansón, Salomón
+14. Getsemaní, Edén, Jericó, Sinaí
+15. David, Saúl, Salomón, Samuel
+16. 7, 10, 12, 40
+17. Esaú, José, Benjamín, Rubén
+18. Una serpiente, Un león, Una paloma, Un cordero
+19. Génesis, Salmos, Apocalipsis, Lucas
+20. Lázaro, Pedro, Juan, Mateo
+21. David, Abraham, Moisés, Aarón
+22. Saúl, Salomón, David, Daniel
+23. Pan, Maná, Codornices, Agua
+24. 7 días, 12 días, 40 días, 100 días
+25. Goliat, Faraón, Herodes, Saúl
+26. Pedro y Juan, Jacob y Esaú, Caín y Abel, Moisés y Aarón
+27. Marta, María, Juana, Magdalena
+28. Polvo, Una costilla de Adán, Barro, Una piedra
+29. El Arca, El Templo, La Torre de Babel, Un palacio
+30. Josué, Caleb, Aarón, Gedeón
+31. Una paloma, Un cuervo, Un águila, Un gorrión
+32. Pedro, Juan el Bautista, Pablo, Santiago
+33. Jerusalén, Nínive, Sodoma, Jericó
+34. 7 días, 10 días, 40 días, 3 días
+35. Judas, Pedro, Tomás, Juan
+36. Pino, Cedro, Gofer, Roble
+37. Saúl, David, Samuel, Salomón
+38. Una nube, Un arcoíris, Una estrella, Un rayo
+39. Una nube, Una zarza ardiendo, Una roca, Una tormenta
+40. Juan, Andrés, Pedro, Tomás
+41. Curó a un ciego, Multiplicó los panes, Convirtió el agua en vino, Caminó sobre el mar
+42. Moisés, Abraham, Isaac, Jacob
+43. La esposa de Lot, La esposa de Noé, Sara, Rebeca
+44. Con maná del cielo, Con 5 panes y 2 pescados, Con frutas del desierto, Con codornices
+45. Pedro, Juan, Tomás, Judas
+46. Génesis, Proverbios, Salmos, Isaías
+47. 3, 7, 10, 12
+48. Rut, Ester, María, Débora
+49. Carpintero, Recaudador de impuestos, Pescador, Pastor
+50. Moisés, Elías, Isaías, Jeremías
