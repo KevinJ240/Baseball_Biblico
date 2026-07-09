@@ -37,9 +37,9 @@ public class QuestionPanel
         );
 
         Rectangle areaPregunta = new(
-            panel.X + UILayout.QuestionPaddingX,
+            panel.X + 10,
             panel.Y + UILayout.QuestionTextY,
-            panel.Width - (UILayout.QuestionPaddingX * 2) - 80,
+            panel.Width - 10,
             UILayout.QuestionAreaHeight
         );
 
@@ -107,10 +107,17 @@ public class QuestionPanel
     private void DrawCentered(string text, float y, int fontSize, Color color)
     {
         Vector2 size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
-        float x = panel.X + (panel.Width - size.X) / 2f + UILayout.TitleOffsetX;
-        y += UILayout.TitleOffsetY;
 
-        Raylib.DrawTextEx(fuente, text, new Vector2(x, y), fontSize, 1, color);
+        float x = panel.X + (panel.Width - size.X) / 2f;
+
+        Raylib.DrawTextEx(
+            fuente,
+            text,
+            new Vector2(x, y),
+            fontSize,
+            1,
+            color
+        );
     }
 
     private void DrawTextInsideRect(string text, Rectangle rect, int fontSize, Color color)
@@ -123,31 +130,53 @@ public class QuestionPanel
             size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
         }
 
-        float x = rect.X + (rect.Width - size.X) / 2f + UILayout.AnswerTextOffsetX;
-        float y = rect.Y + (rect.Height - size.Y) / 2f + UILayout.AnswerTextOffsetY;
+        float x = rect.X + (rect.Width - size.X) / 2f;
+        float y = rect.Y + (rect.Height - size.Y) / 2f;
 
-        Raylib.DrawTextEx(fuente, text, new Vector2(x, y), fontSize, 1, color);
+        Raylib.DrawTextEx(
+            fuente,
+            text,
+            new Vector2(x, y),
+            fontSize,
+            1,
+            color
+        );
     }
 
     private void DrawWrappedCentered(string text, Rectangle area, int fontSize, Color color)
     {
-        float margenInterno = 50;
+        int currentFontSize = fontSize;
+
+        float margenInterno = 10;
         float maxWidth = area.Width - margenInterno * 2;
 
-        List<string> lines = WrapText(text, maxWidth, fontSize);
+        List<string> lines = WrapText(text, maxWidth, currentFontSize);
 
-        float lineHeight = fontSize + 8;
+        while ((lines.Count * (currentFontSize + 8)) > area.Height && currentFontSize > 14)
+        {
+            currentFontSize--;
+            lines = WrapText(text, maxWidth, currentFontSize);
+        }
+
+        float lineHeight = currentFontSize + 8;
         float totalHeight = lines.Count * lineHeight;
         float startY = area.Y + (area.Height - totalHeight) / 2f;
 
         for (int i = 0; i < lines.Count; i++)
         {
-            Vector2 size = Raylib.MeasureTextEx(fuente, lines[i], fontSize, 1);
+            Vector2 size = Raylib.MeasureTextEx(fuente, lines[i], currentFontSize, 1);
 
             float x = area.X + margenInterno + (maxWidth - size.X) / 2f;
             float y = startY + i * lineHeight;
 
-            Raylib.DrawTextEx(fuente, lines[i], new Vector2(x, y), fontSize, 1, color);
+            Raylib.DrawTextEx(
+                fuente,
+                lines[i],
+                new Vector2(x, y),
+                currentFontSize,
+                1,
+                color
+            );
         }
     }
 
