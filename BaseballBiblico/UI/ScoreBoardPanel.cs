@@ -1,5 +1,6 @@
 ﻿using Raylib_cs;
 using System.Numerics;
+using BaseballBiblico.Core;
 
 namespace BaseballBiblico.UI;
 
@@ -28,9 +29,9 @@ public class ScoreBoardPanel
         Rectangle centerPanel = new(board.X + 400, board.Y + 10, 430, board.Height - 20);
         Rectangle rightPanel = new(board.X + 840, board.Y + 10, 380, board.Height - 20);
 
-        DrawTeamPanel(leftPanel, "EQUIPO A", EquipoA);
+        DrawTeamPanel(leftPanel, GameSettings.NombreEquipoA, EquipoA);
         DrawCenterPanel(centerPanel);
-        DrawTeamPanel(rightPanel, "EQUIPO B", EquipoB);
+        DrawTeamPanel(rightPanel, GameSettings.NombreEquipoB, EquipoB);
 
         DrawStrikePanel(leftPanel);
         DrawOutPanel(rightPanel);
@@ -67,16 +68,13 @@ public class ScoreBoardPanel
         DrawCenteredText("INNING", rect, 16, 28, texto);
         DrawCenteredText(Inning.ToString(), rect, 52, 58, rojoLed);
 
-        string turnoText = $"TURNO: EQUIPO {Turno}";
-        int size = 22;
-        int w = Raylib.MeasureText(turnoText, size);
-        Raylib.DrawText(
-            turnoText,
-            (int)(rect.X + rect.Width / 2 - w / 2),
-            (int)(rect.Y + 105),
-            size,
-            amarillo
-        );
+        string nombreTurno = Turno == "A"
+            ? GameSettings.NombreEquipoA
+            : GameSettings.NombreEquipoB;
+
+        string turnoText = $"TURNO: {nombreTurno}";
+
+        DrawCenteredText(turnoText, rect, 105, 22, amarillo);
     }
 
     private void DrawStrikePanel(Rectangle leftPanel)
