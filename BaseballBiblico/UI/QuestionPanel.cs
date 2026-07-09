@@ -37,13 +37,13 @@ public class QuestionPanel
         );
 
         Rectangle areaPregunta = new(
-            panel.X + 10,
+            panel.X + 25,
             panel.Y + UILayout.QuestionTextY,
-            panel.Width - 10,
+            panel.Width - 50,
             UILayout.QuestionAreaHeight
         );
 
-        DrawWrappedCentered(preguntaTexto, areaPregunta, 20, Color.Black);
+        DrawQuestionText(preguntaTexto, areaPregunta, 18, Color.Black);
 
         if (!string.IsNullOrWhiteSpace(dificultad))
             DrawCentered($"Dificultad: {dificultad}", panel.Y + UILayout.DifficultyY, 22, Color.DarkBlue);
@@ -87,51 +87,28 @@ public class QuestionPanel
         Color fondo = Color.White;
 
         if (mostrarResultado)
-        {
-            if (answerIndex == correctAnswer)
-                fondo = new Color(90, 220, 120, 255); // verde
-            else
-                fondo = new Color(230, 90, 90, 255); // rojo
-        }
+            fondo = answerIndex == correctAnswer
+                ? new Color(90, 220, 120, 255)
+                : new Color(230, 90, 90, 255);
         else if (hover)
-        {
             fondo = Color.SkyBlue;
-        }
 
         Raylib.DrawRectangleRec(rect, fondo);
         Raylib.DrawRectangleLinesEx(rect, 2, Color.Black);
 
-        DrawTextInsideRect(text, rect, 22, Color.Black);
+        DrawTextInsideRect(text, rect, 20, Color.Black);
     }
 
     private void DrawCentered(string text, float y, int fontSize, Color color)
     {
-        Vector2 size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
+        float x;
 
-        float x = panel.X + (panel.Width - size.X) / 2f;
-
-        Raylib.DrawTextEx(
-            fuente,
-            text,
-            new Vector2(x, y),
-            fontSize,
-            1,
-            color
-        );
-    }
-
-    private void DrawTextInsideRect(string text, Rectangle rect, int fontSize, Color color)
-    {
-        Vector2 size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
-
-        while (size.X > rect.Width - 20 && fontSize > 14)
-        {
-            fontSize--;
-            size = Raylib.MeasureTextEx(fuente, text, fontSize, 1);
-        }
-
-        float x = rect.X + (rect.Width - size.X) / 2f;
-        float y = rect.Y + (rect.Height - size.Y) / 2f;
+        if (text == "PREGUNTA")
+            x = panel.X + 200;
+        else if (text.StartsWith("Dificultad"))
+            x = panel.X + 200;
+        else
+            x = panel.X + 40;
 
         Raylib.DrawTextEx(
             fuente,
@@ -143,68 +120,58 @@ public class QuestionPanel
         );
     }
 
-    private void DrawWrappedCentered(string text, Rectangle area, int fontSize, Color color)
+    private void DrawQuestionText(string text, Rectangle area, int fontSize, Color color)
     {
-        int currentFontSize = fontSize;
+        List<string> lines = WrapTextByCharacters(text, 42);
 
-        float margenInterno = 10;
-        float maxWidth = area.Width - margenInterno * 2;
-
-        List<string> lines = WrapText(text, maxWidth, currentFontSize);
-
-        while ((lines.Count * (currentFontSize + 8)) > area.Height && currentFontSize > 14)
-        {
-            currentFontSize--;
-            lines = WrapText(text, maxWidth, currentFontSize);
-        }
-
-        float lineHeight = currentFontSize + 8;
+        float lineHeight = fontSize + 8;
         float totalHeight = lines.Count * lineHeight;
         float startY = area.Y + (area.Height - totalHeight) / 2f;
 
+        float x = panel.X + 45; // margen izquierdo fijo
+
+        Raylib.BeginScissorMode(
+            (int)(panel.X + 35),
+            (int)area.Y,
+            (int)(panel.Width - 70),
+            (int)area.Height
+        );
+
         for (int i = 0; i < lines.Count; i++)
         {
-            Vector2 size = Raylib.MeasureTextEx(fuente, lines[i], currentFontSize, 1);
-
-            float x = area.X + margenInterno + (maxWidth - size.X) / 2f;
             float y = startY + i * lineHeight;
-
-            Raylib.DrawTextEx(
-                fuente,
-                lines[i],
-                new Vector2(x, y),
-                currentFontSize,
-                1,
-                color
-            );
+            Raylib.DrawTextEx(fuente, lines[i], new Vector2(x, y), fontSize, 1, color);
         }
+
+        Raylib.EndScissorMode();
     }
 
-    private List<string> WrapText(string text, float maxWidth, int fontSize)
+    private List<string> WrapTextByCharacters(string text, int maxChars)
     {
         List<string> lines = new();
-        string[] words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
+        if (string.IsNullOrWhiteSpace(text))
+            return lines;
+
+        string[] words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         string current = "";
 
         foreach (string word in words)
         {
             string test = string.IsNullOrWhiteSpace(current)
                 ? word
-                : current + " " + word;
+                : $"{current} {word}";
 
-            Vector2 size = Raylib.MeasureTextEx(fuente, test, fontSize, 1);
-
-            if (size.X > maxWidth)
+            if (test.Length <= maxChars)
+            {
+                current = test;
+            }
+            else
             {
                 if (!string.IsNullOrWhiteSpace(current))
                     lines.Add(current);
 
                 current = word;
-            }
-            else
-            {
-                current = test;
             }
         }
 
@@ -212,6 +179,74 @@ public class QuestionPanel
             lines.Add(current);
 
         return lines;
+    }
+
+    private List<string> WrapTextByWidth(string text, float maxWidth, int fontSize)
+    {
+        List<string> lines = new();
+
+        if (string.IsNullOrWhiteSpace(text))
+            return lines;
+
+        string[] words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        string line = "";
+
+        foreach (string word in words)
+        {
+            string test = string.IsNullOrWhiteSpace(line) ? word : $"{line} {word}";
+            Vector2 testSize = Raylib.MeasureTextEx(fuente, test, fontSize, 1);
+
+            if (testSize.X <= maxWidth)
+            {
+                line = test;
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(line))
+                    lines.Add(line);
+
+                line = word;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(line))
+            lines.Add(line);
+
+        return lines;
+    }
+
+    private void DrawTextInsideRect(string text, Rectangle rect, int fontSize, Color color)
+    {
+        int currentFontSize = fontSize;
+        List<string> lines = WrapTextByCharacters(text, 12);
+
+        while (lines.Count * (currentFontSize + 4) > rect.Height - 8 && currentFontSize > 12)
+        {
+            currentFontSize--;
+        }
+
+        float lineHeight = currentFontSize + 4;
+        float totalHeight = lines.Count * lineHeight;
+        float startY = rect.Y + (rect.Height - totalHeight) / 2f;
+
+        Raylib.BeginScissorMode(
+            (int)rect.X,
+            (int)rect.Y,
+            (int)rect.Width,
+            (int)rect.Height
+        );
+
+        for (int i = 0; i < lines.Count; i++)
+        {
+            Vector2 size = Raylib.MeasureTextEx(fuente, lines[i], currentFontSize, 1);
+
+            float x = rect.X + (rect.Width - size.X) / 2f + UILayout.AnswerTextOffsetX;
+            float y = startY + i * lineHeight;
+
+            Raylib.DrawTextEx(fuente, lines[i], new Vector2(x, y), currentFontSize, 1, color);
+        }
+
+        Raylib.EndScissorMode();
     }
 
     public int GetClickedAnswer(Pregunta pregunta)
