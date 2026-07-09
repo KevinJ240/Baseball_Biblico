@@ -8,13 +8,65 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Preguntas\Double\Correctas.txt" />
+    <None Remove="Assets\Preguntas\Double\Preguntas.txt" />
+    <None Remove="Assets\Preguntas\Double\Respuesta.txt" />
+    <None Remove="Assets\Preguntas\Hit\Correctas.txt" />
+    <None Remove="Assets\Preguntas\Hit\Preguntas.txt" />
+    <None Remove="Assets\Preguntas\Hit\Respuesta.txt" />
+    <None Remove="Assets\Preguntas\Home Run\Correctas.txt" />
+    <None Remove="Assets\Preguntas\Home Run\Preguntas.txt" />
+    <None Remove="Assets\Preguntas\Home Run\Respuesta.txt" />
+    <None Remove="Assets\Preguntas\Triple\Correctas.txt" />
+    <None Remove="Assets\Preguntas\Triple\Preguntas.txt" />
+    <None Remove="Assets\Preguntas\Triple\Respuesta.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Preguntas\Double\Correctas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Double\Preguntas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Double\Respuesta.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Hit\Correctas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Hit\Preguntas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Hit\Respuesta.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Home Run\Correctas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Home Run\Preguntas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Home Run\Respuesta.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Triple\Correctas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Triple\Preguntas.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Preguntas\Triple\Respuesta.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Raylib-cs" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Assets\Fonts\" />
-    <Folder Include="Assets\Preguntas\Home Run\" />
-    <Folder Include="Assets\Preguntas\Triple\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,42 +89,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Images\Marcador.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\double\Correctas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\double\Preguntas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\double\Respuesta.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\Hit\Correctas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\Hit\Preguntas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\Hit\Respuesta.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\home run\Correctas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\home run\Preguntas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\home run\Respuesta.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\triple\Correctas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\triple\Preguntas.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Preguntas\triple\Respuesta.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

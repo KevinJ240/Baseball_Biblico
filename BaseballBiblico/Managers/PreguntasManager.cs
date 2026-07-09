@@ -11,7 +11,7 @@ public class QuestionManager
     public QuestionManager()
     {
         LoadQuestions("Hit", "Assets/Preguntas/Hit");
-        LoadQuestions("Doble", "Assets/Preguntas/Doble");
+        LoadQuestions("Doble", "Assets/Preguntas/Double");
         LoadQuestions("Triple", "Assets/Preguntas/Triple");
         LoadQuestions("HomeRun", "Assets/Preguntas/Home Run");
     }

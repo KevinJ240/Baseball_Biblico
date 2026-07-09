@@ -11,18 +11,18 @@ public static class UILayout
     public const float QuestionTitleY = 30;
     public const float QuestionLineY = 95;
     public const float QuestionTextY = 130;
-    public const float DifficultyY = 245;
+    public const float DifficultyY = 285;
 
     // Área interna de la pregunta
-    public const float QuestionPaddingX = 50;
-    public const float QuestionAreaHeight = 90;
+    public const float QuestionPaddingX = 80;
+    public const float QuestionAreaHeight = 150;
 
     // Botones de respuesta
     public const float AnswerButtonWidth = 220;
     public const float AnswerButtonHeight = 58;
     public const float AnswerButtonSpaceX = 35;
     public const float AnswerButtonSpaceY = 25;
-    public const float AnswerButtonStartY = 300;
+    public const float AnswerButtonStartY = 320;
 
     // Campo de baseball
     public static readonly Rectangle Field = new(65, 215, 520, 520);
@@ -32,7 +32,7 @@ public static class UILayout
     public const float TitleOffsetX = -80;
     public const float TitleOffsetY = 0;
 
-    public const float QuestionOffsetX = -250;
+    public const float QuestionOffsetX = -210;
     public const float QuestionOffsetY = 0;
 
     public const float DifficultyOffsetX = -250;

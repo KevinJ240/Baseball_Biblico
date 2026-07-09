@@ -39,11 +39,11 @@ public class QuestionPanel
         Rectangle areaPregunta = new(
             panel.X + UILayout.QuestionPaddingX,
             panel.Y + UILayout.QuestionTextY,
-            panel.Width - (UILayout.QuestionPaddingX * 2),
+            panel.Width - (UILayout.QuestionPaddingX * 2) - 80,
             UILayout.QuestionAreaHeight
         );
 
-        DrawWrappedCentered(preguntaTexto, areaPregunta, 22, Color.Black);
+        DrawWrappedCentered(preguntaTexto, areaPregunta, 20, Color.Black);
 
         if (!string.IsNullOrWhiteSpace(dificultad))
             DrawCentered($"Dificultad: {dificultad}", panel.Y + UILayout.DifficultyY, 22, Color.DarkBlue);
@@ -131,7 +131,10 @@ public class QuestionPanel
 
     private void DrawWrappedCentered(string text, Rectangle area, int fontSize, Color color)
     {
-        List<string> lines = WrapText(text, area.Width, fontSize);
+        float margenInterno = 50;
+        float maxWidth = area.Width - margenInterno * 2;
+
+        List<string> lines = WrapText(text, maxWidth, fontSize);
 
         float lineHeight = fontSize + 8;
         float totalHeight = lines.Count * lineHeight;
@@ -140,8 +143,9 @@ public class QuestionPanel
         for (int i = 0; i < lines.Count; i++)
         {
             Vector2 size = Raylib.MeasureTextEx(fuente, lines[i], fontSize, 1);
-            float x = area.X + (area.Width - size.X) / 2f + UILayout.QuestionOffsetX;
-            float y = startY + i * lineHeight + UILayout.QuestionOffsetY;
+
+            float x = area.X + margenInterno + (maxWidth - size.X) / 2f;
+            float y = startY + i * lineHeight;
 
             Raylib.DrawTextEx(fuente, lines[i], new Vector2(x, y), fontSize, 1, color);
         }
@@ -156,12 +160,17 @@ public class QuestionPanel
 
         foreach (string word in words)
         {
-            string test = string.IsNullOrWhiteSpace(current) ? word : $"{current} {word}";
+            string test = string.IsNullOrWhiteSpace(current)
+                ? word
+                : current + " " + word;
+
             Vector2 size = Raylib.MeasureTextEx(fuente, test, fontSize, 1);
 
-            if (size.X > maxWidth && !string.IsNullOrWhiteSpace(current))
+            if (size.X > maxWidth)
             {
-                lines.Add(current);
+                if (!string.IsNullOrWhiteSpace(current))
+                    lines.Add(current);
+
                 current = word;
             }
             else
