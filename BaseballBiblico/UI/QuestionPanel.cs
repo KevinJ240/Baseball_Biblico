@@ -43,7 +43,7 @@ public class QuestionPanel
             UILayout.QuestionAreaHeight
         );
 
-        DrawQuestionText(preguntaTexto, areaPregunta, 18, Color.Black);
+        DrawQuestionText(preguntaTexto, areaPregunta, 22, Color.Black);
 
         if (!string.IsNullOrWhiteSpace(dificultad))
             DrawCentered($"Dificultad: {dificultad}", panel.Y + UILayout.DifficultyY, 22, Color.DarkBlue);

@@ -61,7 +61,10 @@ public class GameScreen
         campo = Raylib.LoadTexture("Assets/Images/Campo_Baseball.png");
         fichaAzul = Raylib.LoadTexture("Assets/Images/fichaAzul.png");
         fichaRoja = Raylib.LoadTexture("Assets/Images/fichaRoja.png");
-        fuente = Raylib.LoadFontEx("Assets/Fonts/ari-bold.ttf", 32, null, 0);
+        fuente = FontManager.CargarFuenteEspanol(
+            "Assets/Fonts/PatuaOne-Regular.ttf",
+            40
+        );
 
         runnerManager = new RunnerAnimationManager(campoDestino);
 

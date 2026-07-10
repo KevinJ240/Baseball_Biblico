@@ -70,13 +70,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\Fonts\Mr Lucky Clover.ttf">
+    <None Update="Assets\Fonts\ari-bold.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Fonts\Nunito-VariableFont_wght.ttf">
+    <None Update="Assets\Fonts\Louis George Cafe.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Fonts\PatuaOne-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Fonts\Sport Bold.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Fonts\Tommy Bold.otf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Images\Campo_Baseball.png">
