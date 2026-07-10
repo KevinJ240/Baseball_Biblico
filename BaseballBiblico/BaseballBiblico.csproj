@@ -94,6 +94,9 @@
     <None Update="Assets\Images\fichaRoja.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Images\FondoMenu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Images\Marcador.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
