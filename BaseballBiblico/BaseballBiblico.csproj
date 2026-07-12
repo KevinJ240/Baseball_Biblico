@@ -85,6 +85,12 @@
     <None Update="Assets\Fonts\Tommy Bold.otf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Images\Boton1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Images\Boton2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\Images\Campo_Baseball.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

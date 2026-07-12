@@ -7,12 +7,14 @@ namespace BaseballBiblico.Screens;
 
 public class MenuScreen
 {
-    private readonly GameButton btnJugar;
-    private readonly GameButton btnOpciones;
-    private readonly GameButton btnSalir;
-
     private readonly Texture2D fondoMenu;
+    private readonly Texture2D botonNormal;
+    private readonly Texture2D botonHover;
     private readonly Font fuente;
+
+    private readonly ImageButton btnJugar;
+    private readonly ImageButton btnOpciones;
+    private readonly ImageButton btnSalir;
 
     public GameScreenType NextScreen { get; private set; }
         = GameScreenType.Menu;
@@ -23,52 +25,57 @@ public class MenuScreen
             "Assets/Images/FondoMenu.png"
         );
 
+        botonNormal = Raylib.LoadTexture(
+            "Assets/Images/Boton1.png"
+        );
+
+        botonHover = Raylib.LoadTexture(
+            "Assets/Images/Boton2.png"
+        );
+
         fuente = FontManager.CargarFuenteEspanol(
             "Assets/Fonts/PatuaOne-Regular.ttf",
             40
         );
 
-        btnJugar = new GameButton(
-            520,
-            300,
-            240,
-            60,
-            "JUGAR"
+        btnJugar = new ImageButton(
+            new Rectangle(500, 300, 280, 65),
+            botonNormal,
+            botonHover,
+            fuente,
+            "JUGAR",
+            28
         );
 
-        btnOpciones = new GameButton(
-            520,
-            380,
-            240,
-            60,
-            "OPCIONES"
+        btnOpciones = new ImageButton(
+            new Rectangle(500, 385, 280, 65),
+            botonNormal,
+            botonHover,
+            fuente,
+            "OPCIONES",
+            28
         );
 
-        btnSalir = new GameButton(
-            520,
-            460,
-            240,
-            60,
-            "SALIR"
+        btnSalir = new ImageButton(
+            new Rectangle(500, 470, 280, 65),
+            botonNormal,
+            botonHover,
+            fuente,
+            "SALIR",
+            28
         );
     }
 
     public void Update()
     {
         if (btnJugar.IsClicked())
-        {
             NextScreen = GameScreenType.Game;
-        }
 
         if (btnOpciones.IsClicked())
-        {
             NextScreen = GameScreenType.Options;
-        }
 
         if (btnSalir.IsClicked())
-        {
             Environment.Exit(0);
-        }
     }
 
     public void Draw()
@@ -79,14 +86,14 @@ public class MenuScreen
 
         DibujarTextoCentrado(
             "BASEBALL BÍBLICO",
-            100,
+            90,
             55,
             Color.DarkBlue
         );
 
         DibujarTextoCentrado(
             "Videojuego de preguntas bíblicas",
-            180,
+            165,
             28,
             Color.DarkGreen
         );
@@ -96,33 +103,29 @@ public class MenuScreen
         btnSalir.Draw();
 
         DibujarTextoCentrado(
-            "Versión 0.1",
+            "Versión 1.0",
             650,
             20,
-            Color.Gray
+            Color.White
         );
     }
 
     private void DibujarFondo()
     {
-        Rectangle origen = new(
-            0,
-            0,
-            fondoMenu.Width,
-            fondoMenu.Height
-        );
-
-        Rectangle destino = new(
-            0,
-            0,
-            ScreenScaler.VirtualWidth,
-            ScreenScaler.VirtualHeight
-        );
-
         Raylib.DrawTexturePro(
             fondoMenu,
-            origen,
-            destino,
+            new Rectangle(
+                0,
+                0,
+                fondoMenu.Width,
+                fondoMenu.Height
+            ),
+            new Rectangle(
+                0,
+                0,
+                1280,
+                720
+            ),
             Vector2.Zero,
             0,
             Color.White
@@ -142,8 +145,7 @@ public class MenuScreen
             1
         );
 
-        float x =
-            (ScreenScaler.VirtualWidth - medida.X) / 2f;
+        float x = (1280 - medida.X) / 2f;
 
         Raylib.DrawTextEx(
             fuente,
@@ -163,13 +165,15 @@ public class MenuScreen
     public void Unload()
     {
         if (fondoMenu.Id > 0)
-        {
             Raylib.UnloadTexture(fondoMenu);
-        }
+
+        if (botonNormal.Id > 0)
+            Raylib.UnloadTexture(botonNormal);
+
+        if (botonHover.Id > 0)
+            Raylib.UnloadTexture(botonHover);
 
         if (fuente.Texture.Id > 0)
-        {
             Raylib.UnloadFont(fuente);
-        }
     }
 }

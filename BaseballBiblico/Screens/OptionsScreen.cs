@@ -7,63 +7,227 @@ namespace BaseballBiblico.Screens;
 
 public class OptionsScreen
 {
-    private readonly GameButton btnFullscreen;
-    private readonly GameButton btnGuardar;
-    private readonly GameButton btnVolver;
+    // Recursos gráficos
+    private readonly Texture2D botonNormal;
+    private readonly Texture2D botonHover;
+    private readonly Font fuente;
 
-    private string nombreEquipoA = GameSettings.NombreEquipoA;
-    private string nombreEquipoB = GameSettings.NombreEquipoB;
+    // Botones
+    private readonly ImageButton btnFullscreen;
+    private readonly ImageButton btnGuardar;
+    private readonly ImageButton btnVolver;
 
-    private bool editandoEquipoA = false;
-    private bool editandoEquipoB = false;
+    private readonly ImageButton btnRestarInning;
+    private readonly ImageButton btnSumarInning;
 
-    private readonly Rectangle cajaEquipoA = new(420, 230, 440, 50);
-    private readonly Rectangle cajaEquipoB = new(420, 330, 440, 50);
+    // Valores editables
+    private string nombreEquipoA;
+    private string nombreEquipoB;
+    private int totalInnings;
 
-    public GameScreenType NextScreen { get; private set; } = GameScreenType.Options;
+    private bool editandoEquipoA;
+    private bool editandoEquipoB;
+
+    // Cuadros de texto
+    private readonly Rectangle cajaEquipoA =
+        new(420, 190, 440, 50);
+
+    private readonly Rectangle cajaEquipoB =
+        new(420, 280, 440, 50);
+
+    private readonly Rectangle cajaInnings =
+        new(570, 385, 140, 55);
+
+    public GameScreenType NextScreen { get; private set; }
+        = GameScreenType.Options;
 
     public OptionsScreen()
     {
-        btnFullscreen = new GameButton(470, 430, 340, 60, "PANTALLA COMPLETA");
-        btnGuardar = new GameButton(520, 510, 240, 60, "GUARDAR");
-        btnVolver = new GameButton(520, 590, 240, 60, "VOLVER");
+        // Cargar imágenes de los botones
+        botonNormal = Raylib.LoadTexture(
+            "Assets/Images/Boton1.png"
+        );
+
+        botonHover = Raylib.LoadTexture(
+            "Assets/Images/Boton2.png"
+        );
+
+        // Cargar fuente con caracteres en español
+        fuente = FontManager.CargarFuenteEspanol(
+            "Assets/Fonts/PatuaOne-Regular.ttf",
+            40
+        );
+
+        // Cargar los valores actuales
+        nombreEquipoA = GameSettings.NombreEquipoA;
+        nombreEquipoB = GameSettings.NombreEquipoB;
+        totalInnings = GameSettings.TotalInnings;
+
+        // Botón para disminuir innings
+        btnRestarInning = new ImageButton(
+            new Rectangle(480, 385, 70, 55),
+            botonNormal,
+            botonHover,
+            fuente,
+            "-",
+            30
+        );
+
+        // Botón para aumentar innings
+        btnSumarInning = new ImageButton(
+            new Rectangle(730, 385, 70, 55),
+            botonNormal,
+            botonHover,
+            fuente,
+            "+",
+            30
+        );
+
+        btnFullscreen = new ImageButton(
+            new Rectangle(470, 480, 340, 60),
+            botonNormal,
+            botonHover,
+            fuente,
+            "PANTALLA COMPLETA",
+            22
+        );
+
+        btnGuardar = new ImageButton(
+            new Rectangle(520, 560, 240, 60),
+            botonNormal,
+            botonHover,
+            fuente,
+            "GUARDAR",
+            24
+        );
+
+        btnVolver = new ImageButton(
+            new Rectangle(520, 640, 240, 60),
+            botonNormal,
+            botonHover,
+            fuente,
+            "VOLVER",
+            24
+        );
     }
 
     public void Update()
     {
-        Vector2 mouse = Raylib.GetMousePosition();
+        Vector2 mouse = ScreenScaler.GetVirtualMouse();
 
         if (Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
-            editandoEquipoA = Raylib.CheckCollisionPointRec(mouse, cajaEquipoA);
-            editandoEquipoB = Raylib.CheckCollisionPointRec(mouse, cajaEquipoB);
+            editandoEquipoA =
+                Raylib.CheckCollisionPointRec(
+                    mouse,
+                    cajaEquipoA
+                );
+
+            editandoEquipoB =
+                Raylib.CheckCollisionPointRec(
+                    mouse,
+                    cajaEquipoB
+                );
         }
 
         LeerTexto();
 
+        if (btnRestarInning.IsClicked())
+        {
+            totalInnings--;
+
+            if (totalInnings < 1)
+            {
+                totalInnings = 1;
+            }
+        }
+
+        if (btnSumarInning.IsClicked())
+        {
+            totalInnings++;
+
+            if (totalInnings > 9)
+            {
+                totalInnings = 9;
+            }
+        }
+
         if (btnFullscreen.IsClicked())
+        {
             Raylib.ToggleFullscreen();
+        }
 
         if (btnGuardar.IsClicked())
-            GuardarNombres();
+        {
+            GuardarConfiguracion();
+        }
 
         if (btnVolver.IsClicked())
+        {
             NextScreen = GameScreenType.Menu;
+        }
     }
 
     public void Draw()
     {
-        Raylib.ClearBackground(new Color(73, 138, 44, 255));
+        Raylib.ClearBackground(
+            new Color(73, 138, 44, 255)
+        );
 
-        Raylib.DrawText("OPCIONES", 470, 80, 50, Color.White);
+        DibujarTextoCentrado(
+            "OPCIONES",
+            75,
+            46,
+            Color.White
+        );
 
-        Raylib.DrawText("Nombre Equipo A", 420, 200, 24, Color.White);
-        DibujarCajaTexto(cajaEquipoA, nombreEquipoA, editandoEquipoA);
+        Raylib.DrawTextEx(
+            fuente,
+            "Nombre Equipo A",
+            new Vector2(420, 155),
+            23,
+            1,
+            Color.White
+        );
 
-        Raylib.DrawText("Nombre Equipo B", 420, 300, 24, Color.White);
-        DibujarCajaTexto(cajaEquipoB, nombreEquipoB, editandoEquipoB);
+        DibujarCajaTexto(
+            cajaEquipoA,
+            nombreEquipoA,
+            editandoEquipoA
+        );
 
-        Raylib.DrawText("Activa o desactiva pantalla completa", 405, 390, 24, Color.White);
+        Raylib.DrawTextEx(
+            fuente,
+            "Nombre Equipo B",
+            new Vector2(420, 245),
+            23,
+            1,
+            Color.White
+        );
+
+        DibujarCajaTexto(
+            cajaEquipoB,
+            nombreEquipoB,
+            editandoEquipoB
+        );
+
+        DibujarTextoCentrado(
+            "CANTIDAD DE INNINGS",
+            345,
+            24,
+            Color.White
+        );
+
+        btnRestarInning.Draw();
+        DibujarCajaInnings();
+        btnSumarInning.Draw();
+
+        DibujarTextoCentrado(
+            "Mínimo 1 - Máximo 9",
+            445,
+            18,
+            Color.White
+        );
 
         btnFullscreen.Draw();
         btnGuardar.Draw();
@@ -74,8 +238,14 @@ public class OptionsScreen
     {
         NextScreen = GameScreenType.Options;
 
-        nombreEquipoA = GameSettings.NombreEquipoA;
-        nombreEquipoB = GameSettings.NombreEquipoB;
+        nombreEquipoA =
+            GameSettings.NombreEquipoA;
+
+        nombreEquipoB =
+            GameSettings.NombreEquipoB;
+
+        totalInnings =
+            GameSettings.TotalInnings;
 
         editandoEquipoA = false;
         editandoEquipoB = false;
@@ -83,57 +253,261 @@ public class OptionsScreen
 
     private void LeerTexto()
     {
-        int key = Raylib.GetCharPressed();
+        int codepoint = Raylib.GetCharPressed();
 
-        while (key > 0)
+        while (codepoint > 0)
         {
-            if (key >= 32 && key <= 126)
-            {
-                if (editandoEquipoA && nombreEquipoA.Length < 14)
-                    nombreEquipoA += (char)key;
+            bool caracterValido =
+                codepoint >= 32 &&
+                codepoint != 127;
 
-                if (editandoEquipoB && nombreEquipoB.Length < 14)
-                    nombreEquipoB += (char)key;
+            if (caracterValido)
+            {
+                string caracter =
+                    char.ConvertFromUtf32(codepoint);
+
+                if (editandoEquipoA &&
+                    nombreEquipoA.Length < 14)
+                {
+                    nombreEquipoA += caracter;
+                }
+
+                if (editandoEquipoB &&
+                    nombreEquipoB.Length < 14)
+                {
+                    nombreEquipoB += caracter;
+                }
             }
 
-            key = Raylib.GetCharPressed();
+            codepoint = Raylib.GetCharPressed();
         }
 
-        if (Raylib.IsKeyPressed(KeyboardKey.Backspace))
+        if (Raylib.IsKeyPressed(
+                KeyboardKey.Backspace))
         {
-            if (editandoEquipoA && nombreEquipoA.Length > 0)
-                nombreEquipoA = nombreEquipoA[..^1];
+            if (editandoEquipoA &&
+                nombreEquipoA.Length > 0)
+            {
+                nombreEquipoA =
+                    nombreEquipoA[..^1];
+            }
 
-            if (editandoEquipoB && nombreEquipoB.Length > 0)
-                nombreEquipoB = nombreEquipoB[..^1];
+            if (editandoEquipoB &&
+                nombreEquipoB.Length > 0)
+            {
+                nombreEquipoB =
+                    nombreEquipoB[..^1];
+            }
+        }
+
+        if (Raylib.IsKeyPressed(
+                KeyboardKey.Enter))
+        {
+            editandoEquipoA = false;
+            editandoEquipoB = false;
         }
     }
 
-    private void GuardarNombres()
+    private void GuardarConfiguracion()
     {
-        GameSettings.NombreEquipoA = string.IsNullOrWhiteSpace(nombreEquipoA)
-            ? "EQUIPO A"
-            : nombreEquipoA.Trim().ToUpper();
+        GameSettings.NombreEquipoA =
+            string.IsNullOrWhiteSpace(nombreEquipoA)
+                ? "EQUIPO A"
+                : nombreEquipoA
+                    .Trim()
+                    .ToUpperInvariant();
 
-        GameSettings.NombreEquipoB = string.IsNullOrWhiteSpace(nombreEquipoB)
-            ? "EQUIPO B"
-            : nombreEquipoB.Trim().ToUpper();
+        GameSettings.NombreEquipoB =
+            string.IsNullOrWhiteSpace(nombreEquipoB)
+                ? "EQUIPO B"
+                : nombreEquipoB
+                    .Trim()
+                    .ToUpperInvariant();
 
-        nombreEquipoA = GameSettings.NombreEquipoA;
-        nombreEquipoB = GameSettings.NombreEquipoB;
+        GameSettings.TotalInnings =
+            Math.Clamp(totalInnings, 1, 9);
+
+        nombreEquipoA =
+            GameSettings.NombreEquipoA;
+
+        nombreEquipoB =
+            GameSettings.NombreEquipoB;
+
+        totalInnings =
+            GameSettings.TotalInnings;
+
+        editandoEquipoA = false;
+        editandoEquipoB = false;
     }
 
-    private void DibujarCajaTexto(Rectangle rect, string texto, bool activo)
+    private void DibujarCajaTexto(
+        Rectangle rect,
+        string texto,
+        bool activo)
     {
-        Raylib.DrawRectangleRec(rect, activo ? Color.LightGray : Color.White);
-        Raylib.DrawRectangleLinesEx(rect, 2, activo ? Color.Yellow : Color.Black);
+        Color fondo = activo
+            ? new Color(225, 225, 225, 255)
+            : Color.White;
 
-        Raylib.DrawText(
+        Color borde = activo
+            ? Color.Yellow
+            : Color.Black;
+
+        Raylib.DrawRectangleRec(
+            rect,
+            fondo
+        );
+
+        Raylib.DrawRectangleLinesEx(
+            rect,
+            3,
+            borde
+        );
+
+        int tamaño = 22;
+
+        Vector2 medida = Raylib.MeasureTextEx(
+            fuente,
             texto,
-            (int)rect.X + 12,
-            (int)rect.Y + 13,
-            24,
+            tamaño,
+            1
+        );
+
+        float x = rect.X + 12;
+
+        float y =
+            rect.Y +
+            (rect.Height - medida.Y) / 2f;
+
+        Raylib.BeginScissorMode(
+            (int)rect.X + 5,
+            (int)rect.Y + 5,
+            (int)rect.Width - 10,
+            (int)rect.Height - 10
+        );
+
+        Raylib.DrawTextEx(
+            fuente,
+            texto,
+            new Vector2(x, y),
+            tamaño,
+            1,
             Color.Black
         );
+
+        if (activo &&
+            ((int)(Raylib.GetTime() * 2) % 2 == 0))
+        {
+            float cursorX =
+                x + medida.X + 3;
+
+            Raylib.DrawLineEx(
+                new Vector2(
+                    cursorX,
+                    rect.Y + 10
+                ),
+                new Vector2(
+                    cursorX,
+                    rect.Y + rect.Height - 10
+                ),
+                2,
+                Color.Black
+            );
+        }
+
+        Raylib.EndScissorMode();
+    }
+
+    private void DibujarCajaInnings()
+    {
+        Raylib.DrawRectangleRec(
+            cajaInnings,
+            Color.White
+        );
+
+        Raylib.DrawRectangleLinesEx(
+            cajaInnings,
+            3,
+            Color.Black
+        );
+
+        string texto =
+            totalInnings.ToString();
+
+        float tamaño = 32;
+
+        Vector2 medida = Raylib.MeasureTextEx(
+            fuente,
+            texto,
+            tamaño,
+            1
+        );
+
+        float x =
+            cajaInnings.X +
+            (cajaInnings.Width - medida.X) / 2f;
+
+        float y =
+            cajaInnings.Y +
+            (cajaInnings.Height - medida.Y) / 2f;
+
+        Raylib.DrawTextEx(
+            fuente,
+            texto,
+            new Vector2(x, y),
+            tamaño,
+            1,
+            Color.Black
+        );
+    }
+
+    private void DibujarTextoCentrado(
+        string texto,
+        float y,
+        float tamaño,
+        Color color)
+    {
+        Vector2 medida = Raylib.MeasureTextEx(
+            fuente,
+            texto,
+            tamaño,
+            1
+        );
+
+        float x =
+            (1280 - medida.X) / 2f;
+
+        Raylib.DrawTextEx(
+            fuente,
+            texto,
+            new Vector2(x, y),
+            tamaño,
+            1,
+            color
+        );
+    }
+
+    public void Unload()
+    {
+        if (botonNormal.Id > 0)
+        {
+            Raylib.UnloadTexture(
+                botonNormal
+            );
+        }
+
+        if (botonHover.Id > 0)
+        {
+            Raylib.UnloadTexture(
+                botonHover
+            );
+        }
+
+        if (fuente.Texture.Id > 0)
+        {
+            Raylib.UnloadFont(
+                fuente
+            );
+        }
     }
 }
