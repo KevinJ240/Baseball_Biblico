@@ -14,6 +14,7 @@ public class MenuScreen
 
     private readonly ImageButton btnJugar;
     private readonly ImageButton btnOpciones;
+    private readonly ImageButton btnCreditos;
     private readonly ImageButton btnSalir;
 
     public GameScreenType NextScreen { get; private set; }
@@ -39,43 +40,66 @@ public class MenuScreen
         );
 
         btnJugar = new ImageButton(
-            new Rectangle(500, 300, 280, 65),
+            new Rectangle(500, 275, 280, 60),
             botonNormal,
             botonHover,
             fuente,
             "JUGAR",
-            28
+            27
         );
 
         btnOpciones = new ImageButton(
-            new Rectangle(500, 385, 280, 65),
+            new Rectangle(500, 350, 280, 60),
             botonNormal,
             botonHover,
             fuente,
             "OPCIONES",
-            28
+            27
+        );
+
+        btnCreditos = new ImageButton(
+            new Rectangle(500, 425, 280, 60),
+            botonNormal,
+            botonHover,
+            fuente,
+            "CRÉDITOS",
+            27
         );
 
         btnSalir = new ImageButton(
-            new Rectangle(500, 470, 280, 65),
+            new Rectangle(500, 500, 280, 60),
             botonNormal,
             botonHover,
             fuente,
             "SALIR",
-            28
+            27
         );
     }
 
     public void Update()
     {
         if (btnJugar.IsClicked())
+        {
             NextScreen = GameScreenType.Game;
+            return;
+        }
 
         if (btnOpciones.IsClicked())
+        {
             NextScreen = GameScreenType.Options;
+            return;
+        }
+
+        if (btnCreditos.IsClicked())
+        {
+            NextScreen = GameScreenType.Credits;
+            return;
+        }
 
         if (btnSalir.IsClicked())
-            Environment.Exit(0);
+        {
+            Raylib.CloseWindow();
+        }
     }
 
     public void Draw()
@@ -86,25 +110,26 @@ public class MenuScreen
 
         DibujarTextoCentrado(
             "BASEBALL BÍBLICO",
-            90,
+            80,
             55,
             Color.DarkBlue
         );
 
         DibujarTextoCentrado(
             "Videojuego de preguntas bíblicas",
-            165,
+            155,
             28,
             Color.DarkGreen
         );
 
         btnJugar.Draw();
         btnOpciones.Draw();
+        btnCreditos.Draw();
         btnSalir.Draw();
 
         DibujarTextoCentrado(
             "Versión 0.1.0",
-            650,
+            665,
             20,
             Color.White
         );
@@ -112,6 +137,11 @@ public class MenuScreen
 
     private void DibujarFondo()
     {
+        if (fondoMenu.Id <= 0)
+        {
+            return;
+        }
+
         Raylib.DrawTexturePro(
             fondoMenu,
             new Rectangle(
@@ -123,8 +153,8 @@ public class MenuScreen
             new Rectangle(
                 0,
                 0,
-                1280,
-                720
+                ScreenScaler.VirtualWidth,
+                ScreenScaler.VirtualHeight
             ),
             Vector2.Zero,
             0,
@@ -145,7 +175,8 @@ public class MenuScreen
             1
         );
 
-        float x = (1280 - medida.X) / 2f;
+        float x =
+            (ScreenScaler.VirtualWidth - medida.X) / 2f;
 
         Raylib.DrawTextEx(
             fuente,
@@ -165,15 +196,23 @@ public class MenuScreen
     public void Unload()
     {
         if (fondoMenu.Id > 0)
+        {
             Raylib.UnloadTexture(fondoMenu);
+        }
 
         if (botonNormal.Id > 0)
+        {
             Raylib.UnloadTexture(botonNormal);
+        }
 
         if (botonHover.Id > 0)
+        {
             Raylib.UnloadTexture(botonHover);
+        }
 
         if (fuente.Texture.Id > 0)
+        {
             Raylib.UnloadFont(fuente);
+        }
     }
 }

@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 namespace BaseballBiblico.Core;
 
+
 public enum GameScreenType
 {
     Menu,
     Game,
-    Options 
+    Options,
+    Credits
 }

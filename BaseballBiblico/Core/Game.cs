@@ -1,6 +1,6 @@
 ﻿using Raylib_cs;
-using BaseballBiblico.Screens;
 using System.Numerics;
+using BaseballBiblico.Screens;
 
 namespace BaseballBiblico.Core;
 
@@ -11,6 +11,7 @@ public class Game
     private readonly MenuScreen menuScreen;
     private readonly GameScreen gameScreen;
     private readonly OptionsScreen optionsScreen;
+    private readonly CreditsScreen creditsScreen;
 
     private RenderTexture2D renderTexture;
 
@@ -18,6 +19,11 @@ public class Game
     {
         Raylib.SetConfigFlags(
             ConfigFlags.ResizableWindow
+        );
+
+        // Solo muestra errores importantes de Raylib.
+        Raylib.SetTraceLogLevel(
+            TraceLogLevel.Error
         );
 
         Raylib.InitWindow(
@@ -28,23 +34,17 @@ public class Game
 
         Raylib.SetTargetFPS(60);
 
-        renderTexture =
-            Raylib.LoadRenderTexture(
-                ScreenScaler.VirtualWidth,
-                ScreenScaler.VirtualHeight
-            );
+        renderTexture = Raylib.LoadRenderTexture(
+            ScreenScaler.VirtualWidth,
+            ScreenScaler.VirtualHeight
+        );
 
-        menuScreen =
-            new MenuScreen();
+        menuScreen = new MenuScreen();
+        gameScreen = new GameScreen();
+        optionsScreen = new OptionsScreen();
+        creditsScreen = new CreditsScreen();
 
-        gameScreen =
-            new GameScreen();
-
-        optionsScreen =
-            new OptionsScreen();
-
-        currentScreen =
-            GameScreenType.Menu;
+        currentScreen = GameScreenType.Menu;
     }
 
     public void Run()
@@ -81,6 +81,10 @@ public class Game
             case GameScreenType.Options:
                 ActualizarOpciones();
                 break;
+
+            case GameScreenType.Credits:
+                ActualizarCreditos();
+                break;
         }
     }
 
@@ -88,31 +92,32 @@ public class Game
     {
         menuScreen.Update();
 
-        if (menuScreen.NextScreen ==
-            GameScreenType.Game)
+        if (menuScreen.NextScreen == GameScreenType.Game)
         {
-            /*
-             * Aquí es donde comienza realmente
-             * una partida completamente nueva.
-             */
+            // Cada vez que se pulsa JUGAR,
+            // comienza una partida completamente nueva.
             gameScreen.IniciarNuevaPartida();
 
             menuScreen.Reset();
-
-            currentScreen =
-                GameScreenType.Game;
-
+            currentScreen = GameScreenType.Game;
             return;
         }
 
-        if (menuScreen.NextScreen ==
-            GameScreenType.Options)
+        if (menuScreen.NextScreen == GameScreenType.Options)
         {
             optionsScreen.Reset();
             menuScreen.Reset();
 
-            currentScreen =
-                GameScreenType.Options;
+            currentScreen = GameScreenType.Options;
+            return;
+        }
+
+        if (menuScreen.NextScreen == GameScreenType.Credits)
+        {
+            creditsScreen.Reset();
+            menuScreen.Reset();
+
+            currentScreen = GameScreenType.Credits;
         }
     }
 
@@ -120,17 +125,10 @@ public class Game
     {
         gameScreen.Update();
 
-        if (gameScreen.NextScreen ==
-            GameScreenType.Menu)
+        if (gameScreen.NextScreen == GameScreenType.Menu)
         {
-            /*
-             * VOLVER únicamente cambia de pantalla.
-             * No es necesario reiniciar aquí.
-             */
             menuScreen.Reset();
-
-            currentScreen =
-                GameScreenType.Menu;
+            currentScreen = GameScreenType.Menu;
         }
     }
 
@@ -138,14 +136,25 @@ public class Game
     {
         optionsScreen.Update();
 
-        if (optionsScreen.NextScreen ==
-            GameScreenType.Menu)
+        if (optionsScreen.NextScreen == GameScreenType.Menu)
         {
             menuScreen.Reset();
             optionsScreen.Reset();
 
-            currentScreen =
-                GameScreenType.Menu;
+            currentScreen = GameScreenType.Menu;
+        }
+    }
+
+    private void ActualizarCreditos()
+    {
+        creditsScreen.Update();
+
+        if (creditsScreen.NextScreen == GameScreenType.Menu)
+        {
+            menuScreen.Reset();
+            creditsScreen.Reset();
+
+            currentScreen = GameScreenType.Menu;
         }
     }
 
@@ -156,12 +165,7 @@ public class Game
         );
 
         Raylib.ClearBackground(
-            new Color(
-                73,
-                138,
-                44,
-                255
-            )
+            new Color(73, 138, 44, 255)
         );
 
         switch (currentScreen)
@@ -177,6 +181,10 @@ public class Game
             case GameScreenType.Options:
                 optionsScreen.Draw();
                 break;
+
+            case GameScreenType.Credits:
+                creditsScreen.Draw();
+                break;
         }
 
         Raylib.EndTextureMode();
@@ -189,20 +197,15 @@ public class Game
 
         Raylib.DrawTexturePro(
             renderTexture.Texture,
-
             new Rectangle(
                 0,
                 0,
                 ScreenScaler.VirtualWidth,
                 -ScreenScaler.VirtualHeight
             ),
-
             ScreenScaler.DestinationRect,
-
             Vector2.Zero,
-
             0,
-
             Color.White
         );
 
@@ -214,5 +217,6 @@ public class Game
         menuScreen.Unload();
         gameScreen.Unload();
         optionsScreen.Unload();
+        creditsScreen.Unload();
     }
 }
