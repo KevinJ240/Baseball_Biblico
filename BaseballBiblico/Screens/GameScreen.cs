@@ -20,15 +20,10 @@ public class GameScreen
     private readonly QuestionManager questionManager = new();
     private RunnerAnimationManager runnerManager;
 
-    private Pregunta currentQuestion = new()
-    {
-        Id = 0,
-        Text = "",
-        Answers = Array.Empty<string>(),
-        CorrectAnswer = 0
-    };
+    private Pregunta currentQuestion = CrearPreguntaVacia();
 
-    private GamePlayState estado = GamePlayState.EsperandoJugada;
+    private GamePlayState estado =
+        GamePlayState.EsperandoJugada;
 
     private bool mostrandoResultado;
     private float tiempoResultado;
@@ -63,7 +58,7 @@ public class GameScreen
 
     private ImageButton btnIntentarOut;
     private ImageButton btnContinuar;
-    private ImageButton btnMenu;
+    private ImageButton btnVolver;
 
     private ScoreBoardPanel scoreBoard;
     private QuestionPanel questionPanel;
@@ -78,6 +73,8 @@ public class GameScreen
         CrearPanelPregunta();
         CrearBotonesBases();
         CrearBotonesInterfaz();
+
+        IniciarNuevaPartida();
     }
 
     private void CargarRecursos()
@@ -138,8 +135,11 @@ public class GameScreen
     {
         btnDoble = new BaseButton(
             new Vector2(
-                campoDestino.X + campoDestino.Width * 0.50f,
-                campoDestino.Y + campoDestino.Height * 0.14f
+                campoDestino.X +
+                campoDestino.Width * 0.50f,
+
+                campoDestino.Y +
+                campoDestino.Height * 0.14f
             ),
             35,
             "Doble",
@@ -148,8 +148,11 @@ public class GameScreen
 
         btnTriple = new BaseButton(
             new Vector2(
-                campoDestino.X + campoDestino.Width * 0.20f,
-                campoDestino.Y + campoDestino.Height * 0.45f
+                campoDestino.X +
+                campoDestino.Width * 0.20f,
+
+                campoDestino.Y +
+                campoDestino.Height * 0.45f
             ),
             35,
             "Triple",
@@ -158,8 +161,11 @@ public class GameScreen
 
         btnHit = new BaseButton(
             new Vector2(
-                campoDestino.X + campoDestino.Width * 0.80f,
-                campoDestino.Y + campoDestino.Height * 0.45f
+                campoDestino.X +
+                campoDestino.Width * 0.80f,
+
+                campoDestino.Y +
+                campoDestino.Height * 0.45f
             ),
             35,
             "Hit",
@@ -168,8 +174,11 @@ public class GameScreen
 
         btnHomeRun = new BaseButton(
             new Vector2(
-                campoDestino.X + campoDestino.Width * 0.50f,
-                campoDestino.Y + campoDestino.Height * 0.82f
+                campoDestino.X +
+                campoDestino.Width * 0.50f,
+
+                campoDestino.Y +
+                campoDestino.Height * 0.82f
             ),
             35,
             "Home Run",
@@ -180,7 +189,12 @@ public class GameScreen
     private void CrearBotonesInterfaz()
     {
         btnIntentarOut = new ImageButton(
-            new Rectangle(750, 565, 220, 64),
+            new Rectangle(
+                750,
+                565,
+                220,
+                64
+            ),
             botonNormal,
             botonHover,
             fuente,
@@ -189,7 +203,12 @@ public class GameScreen
         );
 
         btnContinuar = new ImageButton(
-            new Rectangle(990, 565, 200, 64),
+            new Rectangle(
+                990,
+                565,
+                200,
+                64
+            ),
             botonNormal,
             botonHover,
             fuente,
@@ -197,23 +216,31 @@ public class GameScreen
             19
         );
 
-        // Esquina inferior izquierda.
-        btnMenu = new ImageButton(
-            new Rectangle(20, 665, 170, 45),
+        // Botón en la esquina inferior izquierda.
+        btnVolver = new ImageButton(
+            new Rectangle(
+                20,
+                665,
+                170,
+                45
+            ),
             botonNormal,
             botonHover,
             fuente,
-            "MENÚ",
+            "VOLVER",
             20
         );
     }
 
     public void Update()
     {
-        // Este botón debe comprobarse antes de cualquier otro estado.
-        if (btnMenu.IsClicked())
+        /*
+         * VOLVER solamente solicita regresar al menú.
+         * El reinicio se hará después cuando se presione JUGAR.
+         */
+        if (btnVolver.IsClicked())
         {
-            SalirAlMenu();
+            NextScreen = GameScreenType.Menu;
             return;
         }
 
@@ -226,9 +253,11 @@ public class GameScreen
 
         if (mostrandoResultado)
         {
-            tiempoResultado += Raylib.GetFrameTime();
+            tiempoResultado +=
+                Raylib.GetFrameTime();
 
-            if (tiempoResultado >= TIEMPO_MOSTRAR_RESULTADO)
+            if (tiempoResultado >=
+                TIEMPO_MOSTRAR_RESULTADO)
             {
                 ResolverResultadoDespuesDeMostrar();
             }
@@ -260,7 +289,9 @@ public class GameScreen
 
     private void ActualizarCorredores()
     {
-        runnerManager.Update(Raylib.GetFrameTime());
+        runnerManager.Update(
+            Raylib.GetFrameTime()
+        );
 
         if (runnerManager.IsAnimating)
         {
@@ -277,11 +308,13 @@ public class GameScreen
 
         if (scoreBoard.Turno == "A")
         {
-            scoreBoard.EquipoA += carrerasPendientes;
+            scoreBoard.EquipoA +=
+                carrerasPendientes;
         }
         else
         {
-            scoreBoard.EquipoB += carrerasPendientes;
+            scoreBoard.EquipoB +=
+                carrerasPendientes;
         }
     }
 
@@ -300,9 +333,10 @@ public class GameScreen
             respuestaSeleccionada
         );
 
-        btnMenu.Draw();
+        btnVolver.Draw();
 
-        if (estado == GamePlayState.DecidirBloqueo &&
+        if (estado ==
+                GamePlayState.DecidirBloqueo &&
             !partidaTerminada)
         {
             DibujarPanelBloqueo();
@@ -336,24 +370,30 @@ public class GameScreen
 
         if (btnHomeRun.IsClicked())
         {
-            SeleccionarDificultad("Home Run");
+            SeleccionarDificultad(
+                "Home Run"
+            );
         }
     }
 
     private void UpdatePregunta()
     {
         int respuesta =
-            questionPanel.GetClickedAnswer(currentQuestion);
+            questionPanel.GetClickedAnswer(
+                currentQuestion
+            );
 
         if (respuesta == -1)
         {
             return;
         }
 
-        respuestaSeleccionada = respuesta;
+        respuestaSeleccionada =
+            respuesta;
 
         respuestaFueCorrecta =
-            respuesta == currentQuestion.CorrectAnswer;
+            respuesta ==
+            currentQuestion.CorrectAnswer;
 
         mostrandoResultado = true;
         tiempoResultado = 0f;
@@ -379,11 +419,13 @@ public class GameScreen
         mostrandoResultado = false;
         tiempoResultado = 0f;
 
-        if (estado == GamePlayState.PreguntaAtacante)
+        if (estado ==
+            GamePlayState.PreguntaAtacante)
         {
             ResolverPreguntaAtacante();
         }
-        else if (estado == GamePlayState.PreguntaBloqueo)
+        else if (estado ==
+                 GamePlayState.PreguntaBloqueo)
         {
             ResolverPreguntaBloqueo();
         }
@@ -396,13 +438,16 @@ public class GameScreen
     {
         if (respuestaFueCorrecta)
         {
-            estado = GamePlayState.DecidirBloqueo;
+            estado =
+                GamePlayState.DecidirBloqueo;
 
             pregunta =
-                $"{NombreEquipoDefensor()} puede intentar hacer OUT.";
+                $"{NombreEquipoDefensor()} " +
+                "puede intentar hacer OUT.";
 
             dificultadSeleccionada = "";
-            currentQuestion = CrearPreguntaVacia();
+            currentQuestion =
+                CrearPreguntaVacia();
         }
         else
         {
@@ -432,7 +477,8 @@ public class GameScreen
         }
     }
 
-    private void SeleccionarDificultad(string jugada)
+    private void SeleccionarDificultad(
+        string jugada)
     {
         dificultadSeleccionada = jugada;
 
@@ -459,42 +505,56 @@ public class GameScreen
                 dificultadKeyActual
             );
 
-        preguntaAtacanteId = currentQuestion.Id;
-        pregunta = currentQuestion.Text;
+        preguntaAtacanteId =
+            currentQuestion.Id;
+
+        pregunta =
+            currentQuestion.Text;
 
         if (currentQuestion.Id <= 0)
         {
             dificultadSeleccionada = "";
             dificultadKeyActual = "";
-            estado = GamePlayState.EsperandoJugada;
+
+            estado =
+                GamePlayState.EsperandoJugada;
+
             return;
         }
 
-        estado = GamePlayState.PreguntaAtacante;
+        estado =
+            GamePlayState.PreguntaAtacante;
     }
 
     private void CargarPreguntaBloqueo()
     {
         currentQuestion =
-            questionManager.GetRandomQuestionExcept(
-                dificultadKeyActual,
-                preguntaAtacanteId
-            );
+            questionManager
+                .GetRandomQuestionExcept(
+                    dificultadKeyActual,
+                    preguntaAtacanteId
+                );
 
-        pregunta = currentQuestion.Text;
+        pregunta =
+            currentQuestion.Text;
 
         if (currentQuestion.Id <= 0)
         {
             dificultadSeleccionada = "";
             dificultadKeyActual = "";
-            estado = GamePlayState.EsperandoJugada;
+
+            estado =
+                GamePlayState.EsperandoJugada;
+
             return;
         }
 
         dificultadSeleccionada =
-            $"Bloqueo - {dificultadSeleccionada}";
+            $"Bloqueo - " +
+            dificultadSeleccionada;
 
-        estado = GamePlayState.PreguntaBloqueo;
+        estado =
+            GamePlayState.PreguntaBloqueo;
     }
 
     private void AvanzarCorredores()
@@ -505,7 +565,9 @@ public class GameScreen
             return;
         }
 
-        runnerManager.AdvanceRunners(avancePendiente);
+        runnerManager.AdvanceRunners(
+            avancePendiente
+        );
     }
 
     private void MarcarOut()
@@ -542,7 +604,12 @@ public class GameScreen
             return;
         }
 
-        if (scoreBoard.Inning >= GameSettings.TotalInnings)
+        /*
+         * El Equipo B terminó su turno.
+         * Si es el último inning, termina la partida.
+         */
+        if (scoreBoard.Inning >=
+            GameSettings.TotalInnings)
         {
             FinalizarPartida();
             return;
@@ -556,7 +623,8 @@ public class GameScreen
     {
         partidaTerminada = true;
 
-        currentQuestion = CrearPreguntaVacia();
+        currentQuestion =
+            CrearPreguntaVacia();
 
         pregunta = "";
         dificultadSeleccionada = "";
@@ -564,6 +632,7 @@ public class GameScreen
 
         mostrandoResultado = false;
         tiempoResultado = 0f;
+
         respuestaSeleccionada = -1;
         respuestaFueCorrecta = false;
 
@@ -580,7 +649,7 @@ public class GameScreen
             : GameSettings.NombreEquipoA;
     }
 
-    private Pregunta CrearPreguntaVacia()
+    private static Pregunta CrearPreguntaVacia()
     {
         return new Pregunta
         {
@@ -593,23 +662,27 @@ public class GameScreen
 
     private void LimpiarPregunta()
     {
-        currentQuestion = CrearPreguntaVacia();
+        currentQuestion =
+            CrearPreguntaVacia();
 
         pregunta =
-            "Selecciona una base para recibir una pregunta.";
+            "Selecciona una base para " +
+            "recibir una pregunta.";
 
         dificultadSeleccionada = "";
         dificultadKeyActual = "";
 
         mostrandoResultado = false;
         tiempoResultado = 0f;
+
         respuestaSeleccionada = -1;
         respuestaFueCorrecta = false;
 
         preguntaAtacanteId = 0;
         avancePendiente = 0;
 
-        estado = GamePlayState.EsperandoJugada;
+        estado =
+            GamePlayState.EsperandoJugada;
     }
 
     private void DibujarCampo()
@@ -655,7 +728,12 @@ public class GameScreen
 
         Raylib.DrawRectangleRec(
             panelBloqueo,
-            new Color(245, 245, 245, 250)
+            new Color(
+                245,
+                245,
+                245,
+                250
+            )
         );
 
         Raylib.DrawRectangleLinesEx(
@@ -665,7 +743,8 @@ public class GameScreen
         );
 
         string texto =
-            $"{NombreEquipoDefensor()}, ¿desea intentar OUT?";
+            $"{NombreEquipoDefensor()}, " +
+            "¿desea intentar OUT?";
 
         DibujarTextoCentradoEnRectangulo(
             texto,
@@ -690,7 +769,12 @@ public class GameScreen
             0,
             1280,
             720,
-            new Color(0, 0, 0, 150)
+            new Color(
+                0,
+                0,
+                0,
+                150
+            )
         );
 
         Rectangle panelFinal = new(
@@ -736,8 +820,10 @@ public class GameScreen
         );
 
         string marcador =
-            $"{GameSettings.NombreEquipoA}: {scoreBoard.EquipoA}    " +
-            $"{GameSettings.NombreEquipoB}: {scoreBoard.EquipoB}";
+            $"{GameSettings.NombreEquipoA}: " +
+            $"{scoreBoard.EquipoA}    " +
+            $"{GameSettings.NombreEquipoB}: " +
+            $"{scoreBoard.EquipoB}";
 
         DibujarTextoCentradoEnRectangulo(
             marcador,
@@ -752,7 +838,10 @@ public class GameScreen
         );
 
         DibujarTextoCentradoEnRectangulo(
-            $"Partida de {GameSettings.TotalInnings} inning(s)",
+            $"Partida de " +
+            $"{GameSettings.TotalInnings} " +
+            "inning(s)",
+
             new Rectangle(
                 panelFinal.X + 20,
                 panelFinal.Y + 230,
@@ -766,14 +855,20 @@ public class GameScreen
 
     private string ObtenerTextoGanador()
     {
-        if (scoreBoard.EquipoA > scoreBoard.EquipoB)
+        if (scoreBoard.EquipoA >
+            scoreBoard.EquipoB)
         {
-            return $"GANADOR: {GameSettings.NombreEquipoA}";
+            return
+                $"GANADOR: " +
+                GameSettings.NombreEquipoA;
         }
 
-        if (scoreBoard.EquipoB > scoreBoard.EquipoA)
+        if (scoreBoard.EquipoB >
+            scoreBoard.EquipoA)
         {
-            return $"GANADOR: {GameSettings.NombreEquipoB}";
+            return
+                $"GANADOR: " +
+                GameSettings.NombreEquipoB;
         }
 
         return "EMPATE";
@@ -785,24 +880,28 @@ public class GameScreen
         int tamaño,
         Color color)
     {
-        Vector2 medida = Raylib.MeasureTextEx(
-            fuente,
-            texto,
-            tamaño,
-            1
-        );
-
-        while (medida.X > rect.Width - 20 &&
-               tamaño > 13)
-        {
-            tamaño--;
-
-            medida = Raylib.MeasureTextEx(
+        Vector2 medida =
+            Raylib.MeasureTextEx(
                 fuente,
                 texto,
                 tamaño,
                 1
             );
+
+        while (
+            medida.X >
+            rect.Width - 20 &&
+            tamaño > 13)
+        {
+            tamaño--;
+
+            medida =
+                Raylib.MeasureTextEx(
+                    fuente,
+                    texto,
+                    tamaño,
+                    1
+                );
         }
 
         float x =
@@ -823,20 +922,16 @@ public class GameScreen
         );
     }
 
-    private void SalirAlMenu()
+    /*
+     * Se llama únicamente cuando se presiona JUGAR
+     * desde el menú principal.
+     */
+    public void IniciarNuevaPartida()
     {
-        // Reinicia todos los datos de la partida.
-        ReiniciarEstadoPartida();
+        NextScreen =
+            GameScreenType.Game;
 
-        // Vuelve a habilitar todas las preguntas.
-        questionManager.Reset();
-
-        // Solicita al controlador cambiar al menú.
-        NextScreen = GameScreenType.Menu;
-    }
-
-    private void ReiniciarEstadoPartida()
-    {
+        // Marcador
         scoreBoard.EquipoA = 0;
         scoreBoard.EquipoB = 0;
         scoreBoard.Inning = 1;
@@ -844,58 +939,77 @@ public class GameScreen
         scoreBoard.Outs = 0;
         scoreBoard.Turno = "A";
 
+        // Bases y fichas
         runnerManager.ClearBases();
 
-        partidaTerminada = false;
+        // Preguntas usadas
+        questionManager.Reset();
 
-        currentQuestion = CrearPreguntaVacia();
+        // Pregunta actual
+        currentQuestion =
+            CrearPreguntaVacia();
 
         pregunta =
-            "Selecciona una base para recibir una pregunta.";
+            "Selecciona una base para " +
+            "recibir una pregunta.";
 
         dificultadSeleccionada = "";
         dificultadKeyActual = "";
 
-        mostrandoResultado = false;
-        tiempoResultado = 0f;
-        respuestaSeleccionada = -1;
-        respuestaFueCorrecta = false;
-
         preguntaAtacanteId = 0;
         avancePendiente = 0;
 
-        estado = GamePlayState.EsperandoJugada;
-    }
+        // Resultado y estados
+        mostrandoResultado = false;
+        tiempoResultado = 0f;
 
-    public void Reset()
-    {
-        NextScreen = GameScreenType.Game;
+        respuestaSeleccionada = -1;
+        respuestaFueCorrecta = false;
 
-        ReiniciarEstadoPartida();
+        partidaTerminada = false;
 
-        // También reinicia las preguntas cuando se inicia
-        // una nueva partida desde el menú.
-        questionManager.Reset();
+        estado =
+            GamePlayState.EsperandoJugada;
     }
 
     public void Unload()
     {
         if (campo.Id > 0)
+        {
             Raylib.UnloadTexture(campo);
+        }
 
         if (fichaAzul.Id > 0)
-            Raylib.UnloadTexture(fichaAzul);
+        {
+            Raylib.UnloadTexture(
+                fichaAzul
+            );
+        }
 
         if (fichaRoja.Id > 0)
-            Raylib.UnloadTexture(fichaRoja);
+        {
+            Raylib.UnloadTexture(
+                fichaRoja
+            );
+        }
 
         if (botonNormal.Id > 0)
-            Raylib.UnloadTexture(botonNormal);
+        {
+            Raylib.UnloadTexture(
+                botonNormal
+            );
+        }
 
         if (botonHover.Id > 0)
-            Raylib.UnloadTexture(botonHover);
+        {
+            Raylib.UnloadTexture(
+                botonHover
+            );
+        }
 
         if (fuente.Texture.Id > 0)
+        {
             Raylib.UnloadFont(fuente);
+        }
     }
 }

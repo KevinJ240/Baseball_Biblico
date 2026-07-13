@@ -103,7 +103,7 @@ public class MenuScreen
         btnSalir.Draw();
 
         DibujarTextoCentrado(
-            "Versión 1.0",
+            "Versión 0.1.0",
             650,
             20,
             Color.White

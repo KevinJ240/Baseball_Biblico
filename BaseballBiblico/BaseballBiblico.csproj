@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\Preguntas\Double\Correctas.txt" />
-    <None Remove="Assets\Preguntas\Double\Preguntas.txt" />
-    <None Remove="Assets\Preguntas\Double\Respuesta.txt" />
+    <None Remove="Assets\Preguntas\Doble\Correctas.txt" />
+    <None Remove="Assets\Preguntas\Doble\Preguntas.txt" />
+    <None Remove="Assets\Preguntas\Doble\Respuesta.txt" />
     <None Remove="Assets\Preguntas\Hit\Correctas.txt" />
     <None Remove="Assets\Preguntas\Hit\Preguntas.txt" />
     <None Remove="Assets\Preguntas\Hit\Respuesta.txt" />
@@ -23,13 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets\Preguntas\Double\Correctas.txt">
+    <Content Include="Assets\Preguntas\Doble\Correctas.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Preguntas\Double\Preguntas.txt">
+    <Content Include="Assets\Preguntas\Doble\Preguntas.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Preguntas\Double\Respuesta.txt">
+    <Content Include="Assets\Preguntas\Doble\Respuesta.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Preguntas\Hit\Correctas.txt">

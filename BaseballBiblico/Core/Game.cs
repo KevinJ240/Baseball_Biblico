@@ -1,5 +1,6 @@
 ﻿using Raylib_cs;
 using BaseballBiblico.Screens;
+using System.Numerics;
 
 namespace BaseballBiblico.Core;
 
@@ -15,17 +16,35 @@ public class Game
 
     public Game()
     {
-        Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
-        Raylib.InitWindow(1280, 720, "Baseball Bíblico");
+        Raylib.SetConfigFlags(
+            ConfigFlags.ResizableWindow
+        );
+
+        Raylib.InitWindow(
+            1280,
+            720,
+            "Baseball Bíblico"
+        );
+
         Raylib.SetTargetFPS(60);
 
-        renderTexture = Raylib.LoadRenderTexture(ScreenScaler.VirtualWidth, ScreenScaler.VirtualHeight);
+        renderTexture =
+            Raylib.LoadRenderTexture(
+                ScreenScaler.VirtualWidth,
+                ScreenScaler.VirtualHeight
+            );
 
-        currentScreen = GameScreenType.Menu;
+        menuScreen =
+            new MenuScreen();
 
-        menuScreen = new MenuScreen();
-        gameScreen = new GameScreen();
-        optionsScreen = new OptionsScreen();
+        gameScreen =
+            new GameScreen();
+
+        optionsScreen =
+            new OptionsScreen();
+
+        currentScreen =
+            GameScreenType.Menu;
     }
 
     public void Run()
@@ -38,71 +57,162 @@ public class Game
             Draw();
         }
 
-        Raylib.UnloadRenderTexture(renderTexture);
+        DescargarRecursos();
+
+        Raylib.UnloadRenderTexture(
+            renderTexture
+        );
+
         Raylib.CloseWindow();
     }
 
     private void Update()
     {
-        if (currentScreen == GameScreenType.Menu)
+        switch (currentScreen)
         {
-            menuScreen.Update();
+            case GameScreenType.Menu:
+                ActualizarMenu();
+                break;
 
-            if (menuScreen.NextScreen == GameScreenType.Game)
-            {
-                menuScreen.Reset();
-                currentScreen = GameScreenType.Game;
-            }
-            else if (menuScreen.NextScreen == GameScreenType.Options)
-            {
-                menuScreen.Reset();
-                currentScreen = GameScreenType.Options;
-            }
-        }
-        else if (currentScreen == GameScreenType.Game)
-        {
-            gameScreen.Update();
-        }
-        else if (currentScreen == GameScreenType.Options)
-        {
-            optionsScreen.Update();
+            case GameScreenType.Game:
+                ActualizarPartida();
+                break;
 
-            if (optionsScreen.NextScreen == GameScreenType.Menu)
-            {
-                optionsScreen.Reset();
-                currentScreen = GameScreenType.Menu;
-            }
+            case GameScreenType.Options:
+                ActualizarOpciones();
+                break;
+        }
+    }
+
+    private void ActualizarMenu()
+    {
+        menuScreen.Update();
+
+        if (menuScreen.NextScreen ==
+            GameScreenType.Game)
+        {
+            /*
+             * Aquí es donde comienza realmente
+             * una partida completamente nueva.
+             */
+            gameScreen.IniciarNuevaPartida();
+
+            menuScreen.Reset();
+
+            currentScreen =
+                GameScreenType.Game;
+
+            return;
+        }
+
+        if (menuScreen.NextScreen ==
+            GameScreenType.Options)
+        {
+            optionsScreen.Reset();
+            menuScreen.Reset();
+
+            currentScreen =
+                GameScreenType.Options;
+        }
+    }
+
+    private void ActualizarPartida()
+    {
+        gameScreen.Update();
+
+        if (gameScreen.NextScreen ==
+            GameScreenType.Menu)
+        {
+            /*
+             * VOLVER únicamente cambia de pantalla.
+             * No es necesario reiniciar aquí.
+             */
+            menuScreen.Reset();
+
+            currentScreen =
+                GameScreenType.Menu;
+        }
+    }
+
+    private void ActualizarOpciones()
+    {
+        optionsScreen.Update();
+
+        if (optionsScreen.NextScreen ==
+            GameScreenType.Menu)
+        {
+            menuScreen.Reset();
+            optionsScreen.Reset();
+
+            currentScreen =
+                GameScreenType.Menu;
         }
     }
 
     private void Draw()
     {
-        Raylib.BeginTextureMode(renderTexture);
+        Raylib.BeginTextureMode(
+            renderTexture
+        );
 
-        // Limpia la pantalla virtual antes de dibujar cada screen
-        Raylib.ClearBackground(new Color(73, 138, 44, 255));
+        Raylib.ClearBackground(
+            new Color(
+                73,
+                138,
+                44,
+                255
+            )
+        );
 
-        if (currentScreen == GameScreenType.Menu)
-            menuScreen.Draw();
-        else if (currentScreen == GameScreenType.Game)
-            gameScreen.Draw();
-        else if (currentScreen == GameScreenType.Options)
-            optionsScreen.Draw();
+        switch (currentScreen)
+        {
+            case GameScreenType.Menu:
+                menuScreen.Draw();
+                break;
+
+            case GameScreenType.Game:
+                gameScreen.Draw();
+                break;
+
+            case GameScreenType.Options:
+                optionsScreen.Draw();
+                break;
+        }
 
         Raylib.EndTextureMode();
 
         Raylib.BeginDrawing();
-        Raylib.ClearBackground(Color.Black);
+
+        Raylib.ClearBackground(
+            Color.Black
+        );
 
         Raylib.DrawTexturePro(
             renderTexture.Texture,
-            new Rectangle(0, 0, ScreenScaler.VirtualWidth, -ScreenScaler.VirtualHeight),
+
+            new Rectangle(
+                0,
+                0,
+                ScreenScaler.VirtualWidth,
+                -ScreenScaler.VirtualHeight
+            ),
+
             ScreenScaler.DestinationRect,
-            new System.Numerics.Vector2(0, 0),
+
+            Vector2.Zero,
+
             0,
+
             Color.White
         );
 
         Raylib.EndDrawing();
+    }
+
+    private void DescargarRecursos()
+    {
+        menuScreen.Unload();
+        gameScreen.Unload();
+        optionsScreen.Unload();
     }
 }

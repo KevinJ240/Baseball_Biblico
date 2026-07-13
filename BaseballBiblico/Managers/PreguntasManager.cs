@@ -11,7 +11,7 @@ public class QuestionManager
     public QuestionManager()
     {
         LoadQuestions("Hit", "Assets/Preguntas/Hit");
-        LoadQuestions("Doble", "Assets/Preguntas/Double");
+        LoadQuestions("Doble", "Assets/Preguntas/Doble");
         LoadQuestions("Triple", "Assets/Preguntas/Triple");
         LoadQuestions("HomeRun", "Assets/Preguntas/Home Run");
     }
@@ -146,8 +146,9 @@ public class QuestionManager
 
     public void Reset()
     {
-        foreach (HashSet<int> preguntasUsadas
-                 in usedQuestionsByDifficulty.Values)
+        foreach (
+            HashSet<int> preguntasUsadas
+            in usedQuestionsByDifficulty.Values)
         {
             preguntasUsadas.Clear();
         }
