@@ -12,9 +12,8 @@ public class GameScreen
     private Texture2D campo;
     private Texture2D fichaAzul;
     private Texture2D fichaRoja;
-
-    private Texture2D botonRespuestaNormal;
-    private Texture2D botonRespuestaHover;
+    private Texture2D botonNormal;
+    private Texture2D botonHover;
 
     private Font fuente;
 
@@ -35,7 +34,6 @@ public class GameScreen
     private float tiempoResultado;
     private int respuestaSeleccionada = -1;
     private bool respuestaFueCorrecta;
-
     private bool partidaTerminada;
 
     private const float TIEMPO_MOSTRAR_RESULTADO = 2.0f;
@@ -65,9 +63,13 @@ public class GameScreen
 
     private ImageButton btnIntentarOut;
     private ImageButton btnContinuar;
+    private ImageButton btnMenu;
 
     private ScoreBoardPanel scoreBoard;
     private QuestionPanel questionPanel;
+
+    public GameScreenType NextScreen { get; private set; }
+        = GameScreenType.Game;
 
     public GameScreen()
     {
@@ -75,7 +77,7 @@ public class GameScreen
         CrearMarcador();
         CrearPanelPregunta();
         CrearBotonesBases();
-        CrearBotonesBloqueo();
+        CrearBotonesInterfaz();
     }
 
     private void CargarRecursos()
@@ -92,11 +94,11 @@ public class GameScreen
             "Assets/Images/fichaRoja.png"
         );
 
-        botonRespuestaNormal = Raylib.LoadTexture(
+        botonNormal = Raylib.LoadTexture(
             "Assets/Images/Boton1.png"
         );
 
-        botonRespuestaHover = Raylib.LoadTexture(
+        botonHover = Raylib.LoadTexture(
             "Assets/Images/Boton2.png"
         );
 
@@ -127,8 +129,8 @@ public class GameScreen
         questionPanel = new QuestionPanel(
             panelPregunta,
             fuente,
-            botonRespuestaNormal,
-            botonRespuestaHover
+            botonNormal,
+            botonHover
         );
     }
 
@@ -175,12 +177,12 @@ public class GameScreen
         );
     }
 
-    private void CrearBotonesBloqueo()
+    private void CrearBotonesInterfaz()
     {
         btnIntentarOut = new ImageButton(
             new Rectangle(750, 565, 220, 64),
-            botonRespuestaNormal,
-            botonRespuestaHover,
+            botonNormal,
+            botonHover,
             fuente,
             "INTENTAR OUT",
             19
@@ -188,18 +190,37 @@ public class GameScreen
 
         btnContinuar = new ImageButton(
             new Rectangle(990, 565, 200, 64),
-            botonRespuestaNormal,
-            botonRespuestaHover,
+            botonNormal,
+            botonHover,
             fuente,
             "CONTINUAR",
             19
+        );
+
+        // Esquina inferior izquierda.
+        btnMenu = new ImageButton(
+            new Rectangle(20, 665, 170, 45),
+            botonNormal,
+            botonHover,
+            fuente,
+            "MENÚ",
+            20
         );
     }
 
     public void Update()
     {
-        if (partidaTerminada)
+        // Este botón debe comprobarse antes de cualquier otro estado.
+        if (btnMenu.IsClicked())
+        {
+            SalirAlMenu();
             return;
+        }
+
+        if (partidaTerminada)
+        {
+            return;
+        }
 
         ActualizarCorredores();
 
@@ -216,7 +237,9 @@ public class GameScreen
         }
 
         if (runnerManager.IsAnimating)
+        {
             return;
+        }
 
         switch (estado)
         {
@@ -240,18 +263,26 @@ public class GameScreen
         runnerManager.Update(Raylib.GetFrameTime());
 
         if (runnerManager.IsAnimating)
+        {
             return;
+        }
 
         int carrerasPendientes =
             runnerManager.GetPendingRuns();
 
         if (carrerasPendientes <= 0)
+        {
             return;
+        }
 
         if (scoreBoard.Turno == "A")
+        {
             scoreBoard.EquipoA += carrerasPendientes;
+        }
         else
+        {
             scoreBoard.EquipoB += carrerasPendientes;
+        }
     }
 
     public void Draw()
@@ -268,6 +299,8 @@ public class GameScreen
             mostrandoResultado,
             respuestaSeleccionada
         );
+
+        btnMenu.Draw();
 
         if (estado == GamePlayState.DecidirBloqueo &&
             !partidaTerminada)
@@ -313,7 +346,9 @@ public class GameScreen
             questionPanel.GetClickedAnswer(currentQuestion);
 
         if (respuesta == -1)
+        {
             return;
+        }
 
         respuestaSeleccionada = respuesta;
 
@@ -364,7 +399,7 @@ public class GameScreen
             estado = GamePlayState.DecidirBloqueo;
 
             pregunta =
-                $"{NombreEquipoDefensor()}, ¿desea intentar hacer OUT?";
+                $"{NombreEquipoDefensor()} puede intentar hacer OUT.";
 
             dificultadSeleccionada = "";
             currentQuestion = CrearPreguntaVacia();
@@ -374,7 +409,9 @@ public class GameScreen
             MarcarStrike();
 
             if (!partidaTerminada)
+            {
                 LimpiarPregunta();
+            }
         }
     }
 
@@ -390,7 +427,9 @@ public class GameScreen
         }
 
         if (!partidaTerminada)
+        {
             LimpiarPregunta();
+        }
     }
 
     private void SeleccionarDificultad(string jugada)
@@ -426,6 +465,7 @@ public class GameScreen
         if (currentQuestion.Id <= 0)
         {
             dificultadSeleccionada = "";
+            dificultadKeyActual = "";
             estado = GamePlayState.EsperandoJugada;
             return;
         }
@@ -446,6 +486,7 @@ public class GameScreen
         if (currentQuestion.Id <= 0)
         {
             dificultadSeleccionada = "";
+            dificultadKeyActual = "";
             estado = GamePlayState.EsperandoJugada;
             return;
         }
@@ -501,8 +542,6 @@ public class GameScreen
             return;
         }
 
-        // El Equipo B acaba de terminar su turno.
-        // Aquí se decide si terminó la partida.
         if (scoreBoard.Inning >= GameSettings.TotalInnings)
         {
             FinalizarPartida();
@@ -532,13 +571,6 @@ public class GameScreen
         avancePendiente = 0;
 
         runnerManager.ClearBases();
-    }
-
-    private string EquipoDefensor()
-    {
-        return scoreBoard.Turno == "A"
-            ? "B"
-            : "A";
     }
 
     private string NombreEquipoDefensor()
@@ -571,7 +603,6 @@ public class GameScreen
 
         mostrandoResultado = false;
         tiempoResultado = 0f;
-
         respuestaSeleccionada = -1;
         respuestaFueCorrecta = false;
 
@@ -671,7 +702,7 @@ public class GameScreen
 
         Raylib.DrawRectangleRec(
             panelFinal,
-            new Color(245, 245, 245, 255)
+            Color.RayWhite
         );
 
         Raylib.DrawRectangleLinesEx(
@@ -680,10 +711,8 @@ public class GameScreen
             Color.Black
         );
 
-        string titulo = "PARTIDA TERMINADA";
-
         DibujarTextoCentradoEnRectangulo(
-            titulo,
+            "PARTIDA TERMINADA",
             new Rectangle(
                 panelFinal.X,
                 panelFinal.Y + 25,
@@ -694,13 +723,11 @@ public class GameScreen
             Color.DarkBlue
         );
 
-        string ganador = ObtenerTextoGanador();
-
         DibujarTextoCentradoEnRectangulo(
-            ganador,
+            ObtenerTextoGanador(),
             new Rectangle(
                 panelFinal.X + 20,
-                panelFinal.Y + 95,
+                panelFinal.Y + 100,
                 panelFinal.Width - 40,
                 55
             ),
@@ -716,7 +743,7 @@ public class GameScreen
             marcador,
             new Rectangle(
                 panelFinal.X + 20,
-                panelFinal.Y + 165,
+                panelFinal.Y + 170,
                 panelFinal.Width - 40,
                 50
             ),
@@ -724,16 +751,13 @@ public class GameScreen
             Color.DarkGray
         );
 
-        string innings =
-            $"Partida de {GameSettings.TotalInnings} inning(s)";
-
         DibujarTextoCentradoEnRectangulo(
-            innings,
+            $"Partida de {GameSettings.TotalInnings} inning(s)",
             new Rectangle(
                 panelFinal.X + 20,
-                panelFinal.Y + 225,
+                panelFinal.Y + 230,
                 panelFinal.Width - 40,
-                45
+                40
             ),
             20,
             Color.DarkGray
@@ -799,7 +823,19 @@ public class GameScreen
         );
     }
 
-    public void Reset()
+    private void SalirAlMenu()
+    {
+        // Reinicia todos los datos de la partida.
+        ReiniciarEstadoPartida();
+
+        // Vuelve a habilitar todas las preguntas.
+        questionManager.Reset();
+
+        // Solicita al controlador cambiar al menú.
+        NextScreen = GameScreenType.Menu;
+    }
+
+    private void ReiniciarEstadoPartida()
     {
         scoreBoard.EquipoA = 0;
         scoreBoard.EquipoB = 0;
@@ -831,6 +867,17 @@ public class GameScreen
         estado = GamePlayState.EsperandoJugada;
     }
 
+    public void Reset()
+    {
+        NextScreen = GameScreenType.Game;
+
+        ReiniciarEstadoPartida();
+
+        // También reinicia las preguntas cuando se inicia
+        // una nueva partida desde el menú.
+        questionManager.Reset();
+    }
+
     public void Unload()
     {
         if (campo.Id > 0)
@@ -842,11 +889,11 @@ public class GameScreen
         if (fichaRoja.Id > 0)
             Raylib.UnloadTexture(fichaRoja);
 
-        if (botonRespuestaNormal.Id > 0)
-            Raylib.UnloadTexture(botonRespuestaNormal);
+        if (botonNormal.Id > 0)
+            Raylib.UnloadTexture(botonNormal);
 
-        if (botonRespuestaHover.Id > 0)
-            Raylib.UnloadTexture(botonRespuestaHover);
+        if (botonHover.Id > 0)
+            Raylib.UnloadTexture(botonHover);
 
         if (fuente.Texture.Id > 0)
             Raylib.UnloadFont(fuente);

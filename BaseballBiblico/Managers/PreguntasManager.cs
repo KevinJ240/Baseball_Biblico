@@ -143,4 +143,14 @@ public class QuestionManager
 
         return line.Trim();
     }
+
+    public void Reset()
+    {
+        foreach (HashSet<int> preguntasUsadas
+                 in usedQuestionsByDifficulty.Values)
+        {
+            preguntasUsadas.Clear();
+        }
+    }
+
 }
