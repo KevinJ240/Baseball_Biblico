@@ -26,6 +26,13 @@ public class Game
             TraceLogLevel.Error
         );
 
+        Image icon = Raylib.LoadImage("Assets/Images/icono.png");
+        Raylib.SetWindowIcon(icon);
+        Raylib.UnloadImage(icon);
+
+        Raylib.InitWindow(1280, 720, "Baseball Bíblico");
+
+
         Raylib.InitWindow(
             1280,
             720,
