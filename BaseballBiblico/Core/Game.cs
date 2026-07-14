@@ -15,27 +15,23 @@ public class Game
 
     private RenderTexture2D renderTexture;
 
+    private bool recursosDescargados;
+
     public Game()
     {
         Raylib.SetConfigFlags(
             ConfigFlags.ResizableWindow
         );
 
-        // Solo muestra errores importantes de Raylib.
         Raylib.SetTraceLogLevel(
             TraceLogLevel.Error
         );
 
-        Image icon = Raylib.LoadImage("Assets/Images/icono.png");
-        Raylib.SetWindowIcon(icon);
-        Raylib.UnloadImage(icon);
-
-        Raylib.InitWindow(1280, 720, "Baseball Bíblico");
-
-
+        // Esta debe ser la única llamada a InitWindow
+        // en todo el proyecto.
         Raylib.InitWindow(
-            1280,
-            720,
+            ScreenScaler.VirtualWidth,
+            ScreenScaler.VirtualHeight,
             "Baseball Bíblico"
         );
 
@@ -64,13 +60,7 @@ public class Game
             Draw();
         }
 
-        DescargarRecursos();
-
-        Raylib.UnloadRenderTexture(
-            renderTexture
-        );
-
-        Raylib.CloseWindow();
+        Unload();
     }
 
     private void Update()
@@ -78,31 +68,29 @@ public class Game
         switch (currentScreen)
         {
             case GameScreenType.Menu:
-                ActualizarMenu();
+                UpdateMenu();
                 break;
 
             case GameScreenType.Game:
-                ActualizarPartida();
+                UpdateGame();
                 break;
 
             case GameScreenType.Options:
-                ActualizarOpciones();
+                UpdateOptions();
                 break;
 
             case GameScreenType.Credits:
-                ActualizarCreditos();
+                UpdateCredits();
                 break;
         }
     }
 
-    private void ActualizarMenu()
+    private void UpdateMenu()
     {
         menuScreen.Update();
 
         if (menuScreen.NextScreen == GameScreenType.Game)
         {
-            // Cada vez que se pulsa JUGAR,
-            // comienza una partida completamente nueva.
             gameScreen.IniciarNuevaPartida();
 
             menuScreen.Reset();
@@ -113,8 +101,8 @@ public class Game
         if (menuScreen.NextScreen == GameScreenType.Options)
         {
             optionsScreen.Reset();
-            menuScreen.Reset();
 
+            menuScreen.Reset();
             currentScreen = GameScreenType.Options;
             return;
         }
@@ -122,13 +110,13 @@ public class Game
         if (menuScreen.NextScreen == GameScreenType.Credits)
         {
             creditsScreen.Reset();
-            menuScreen.Reset();
 
+            menuScreen.Reset();
             currentScreen = GameScreenType.Credits;
         }
     }
 
-    private void ActualizarPartida()
+    private void UpdateGame()
     {
         gameScreen.Update();
 
@@ -139,27 +127,27 @@ public class Game
         }
     }
 
-    private void ActualizarOpciones()
+    private void UpdateOptions()
     {
         optionsScreen.Update();
 
         if (optionsScreen.NextScreen == GameScreenType.Menu)
         {
-            menuScreen.Reset();
             optionsScreen.Reset();
+            menuScreen.Reset();
 
             currentScreen = GameScreenType.Menu;
         }
     }
 
-    private void ActualizarCreditos()
+    private void UpdateCredits()
     {
         creditsScreen.Update();
 
         if (creditsScreen.NextScreen == GameScreenType.Menu)
         {
-            menuScreen.Reset();
             creditsScreen.Reset();
+            menuScreen.Reset();
 
             currentScreen = GameScreenType.Menu;
         }
@@ -167,9 +155,8 @@ public class Game
 
     private void Draw()
     {
-        Raylib.BeginTextureMode(
-            renderTexture
-        );
+        // Primero se dibuja en la resolución virtual.
+        Raylib.BeginTextureMode(renderTexture);
 
         Raylib.ClearBackground(
             new Color(73, 138, 44, 255)
@@ -196,19 +183,18 @@ public class Game
 
         Raylib.EndTextureMode();
 
+        // Luego se dibuja la textura virtual en la ventana real.
         Raylib.BeginDrawing();
 
-        Raylib.ClearBackground(
-            Color.Black
-        );
+        Raylib.ClearBackground(Color.Black);
 
         Raylib.DrawTexturePro(
             renderTexture.Texture,
             new Rectangle(
                 0,
                 0,
-                ScreenScaler.VirtualWidth,
-                -ScreenScaler.VirtualHeight
+                renderTexture.Texture.Width,
+                -renderTexture.Texture.Height
             ),
             ScreenScaler.DestinationRect,
             Vector2.Zero,
@@ -219,11 +205,25 @@ public class Game
         Raylib.EndDrawing();
     }
 
-    private void DescargarRecursos()
+    private void Unload()
     {
+        if (recursosDescargados)
+            return;
+
+        recursosDescargados = true;
+
         menuScreen.Unload();
         gameScreen.Unload();
         optionsScreen.Unload();
         creditsScreen.Unload();
+
+        if (renderTexture.Id > 0)
+        {
+            Raylib.UnloadRenderTexture(
+                renderTexture
+            );
+        }
+
+        Raylib.CloseWindow();
     }
 }

@@ -6,38 +6,124 @@ namespace BaseballBiblico.UI;
 
 public class BaseButton
 {
-    public Vector2 Center;
-    public float Radius;
-    public string Text;
-    public string Difficulty;
+    private readonly Vector2 center;
+    private readonly float radius;
 
-    public BaseButton(Vector2 center, float radius, string text, string difficulty)
-    {
-        Center = center;
-        Radius = radius;
-        Text = text;
-        Difficulty = difficulty;
-    }
+    private readonly string title;
+    private readonly string difficulty;
 
-    public bool IsHovered()
+    private readonly Font fuente;
+
+    private readonly Color colorHover =
+        new(190, 145, 55, 210);
+
+    private readonly Color colorBorder =
+        new(255, 215, 0, 255);
+
+    private readonly Color colorText =
+        new(255, 255, 255, 255);
+
+    public BaseButton(
+        Vector2 center,
+        float radius,
+        string title,
+        string difficulty,
+        Font fuente)
     {
-        return Raylib.CheckCollisionPointCircle(ScreenScaler.GetVirtualMouse(), Center, Radius);
+        this.center = center;
+        this.radius = radius;
+        this.title = title;
+        this.difficulty = difficulty;
+        this.fuente = fuente;
     }
 
     public bool IsClicked()
     {
-        return IsHovered() && Raylib.IsMouseButtonPressed(MouseButton.Left);
+        Vector2 mouse =
+            ScreenScaler.GetVirtualMouse();
+
+        bool hover =
+            Vector2.Distance(mouse, center) <= radius;
+
+        return hover &&
+               Raylib.IsMouseButtonPressed(
+                   MouseButton.Left
+               );
     }
 
     public void Draw()
     {
-        if (IsHovered())
-        {
-            Raylib.DrawCircleV(Center, Radius + 10, new Color(255, 215, 0, 90));
-            Raylib.DrawCircleLines((int)Center.X, (int)Center.Y, Radius + 10, Color.Gold);
+        Vector2 mouse =
+            ScreenScaler.GetVirtualMouse();
 
-            int textWidth = Raylib.MeasureText(Text, 24);
-            Raylib.DrawText(Text, (int)(Center.X - textWidth / 2), (int)(Center.Y + 35), 24, Color.Black);
-        }
+        bool hover =
+            Vector2.Distance(mouse, center) <= radius;
+
+        // Cuando el mouse no está encima,
+        // no se dibuja absolutamente nada.
+        if (!hover)
+            return;
+
+        Raylib.DrawCircleV(
+            center,
+            radius,
+            colorHover
+        );
+
+        Raylib.DrawCircleLines(
+            (int)center.X,
+            (int)center.Y,
+            radius,
+            colorBorder
+        );
+
+        Raylib.DrawCircleLines(
+            (int)center.X,
+            (int)center.Y,
+            radius - 2,
+            Color.Black
+        );
+
+        DrawCenteredText(
+            title,
+            center.Y - 13,
+            17,
+            colorText
+        );
+
+        DrawCenteredText(
+            difficulty,
+            center.Y + 7,
+            12,
+            colorText
+        );
+    }
+
+    private void DrawCenteredText(
+        string text,
+        float y,
+        float fontSize,
+        Color color)
+    {
+        Vector2 measurement =
+            Raylib.MeasureTextEx(
+                fuente,
+                text,
+                fontSize,
+                1
+            );
+
+        float x =
+            center.X -
+            measurement.X / 2f;
+
+        Raylib.DrawTextEx(
+            fuente,
+            text,
+            new Vector2(x, y),
+            fontSize,
+            1,
+            color
+        );
     }
 }

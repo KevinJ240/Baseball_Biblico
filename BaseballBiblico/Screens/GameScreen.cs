@@ -110,7 +110,7 @@ public class GameScreen
 
     private void CrearMarcador()
     {
-        scoreBoard = new ScoreBoardPanel
+        scoreBoard = new ScoreBoardPanel(fuente)
         {
             EquipoA = 0,
             EquipoB = 0,
@@ -143,7 +143,8 @@ public class GameScreen
             ),
             35,
             "Doble",
-            "Media"
+            "Media",
+            fuente
         );
 
         btnTriple = new BaseButton(
@@ -156,7 +157,8 @@ public class GameScreen
             ),
             35,
             "Triple",
-            "Difícil"
+            "Difícil",
+            fuente
         );
 
         btnHit = new BaseButton(
@@ -169,7 +171,8 @@ public class GameScreen
             ),
             35,
             "Hit",
-            "Fácil"
+            "Fácil",
+            fuente
         );
 
         btnHomeRun = new BaseButton(
@@ -182,7 +185,8 @@ public class GameScreen
             ),
             35,
             "Home Run",
-            "Muy difícil"
+            "Muy difícil",
+            fuente
         );
     }
 

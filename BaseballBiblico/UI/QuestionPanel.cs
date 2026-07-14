@@ -26,14 +26,37 @@ public class QuestionPanel
     }
 
     public void Draw(
-        Pregunta preguntaActual,
-        string preguntaTexto,
-        string dificultad,
-        bool mostrarResultado = false,
-        int respuestaSeleccionada = -1)
+    Pregunta preguntaActual,
+    string preguntaTexto,
+    string dificultad,
+    bool mostrarResultado = false,
+    int respuestaSeleccionada = -1)
     {
-        Raylib.DrawRectangleRec(panel, Color.RayWhite);
-        Raylib.DrawRectangleLinesEx(panel, 3, Color.Black);
+        // Garantiza que no quede activo un modo de mezcla
+        // usado previamente por otro componente.
+        Raylib.EndShaderMode();
+        Raylib.EndBlendMode();
+
+        Color fondoBlanco = new Color(
+            248,
+            248,
+            248,
+            255
+        );
+
+        Raylib.DrawRectangle(
+            (int)panel.X,
+            (int)panel.Y,
+            (int)panel.Width,
+            (int)panel.Height,
+            fondoBlanco
+        );
+
+        Raylib.DrawRectangleLinesEx(
+            panel,
+            3,
+            Color.Black
+        );
 
         DrawCentered(
             "PREGUNTA",

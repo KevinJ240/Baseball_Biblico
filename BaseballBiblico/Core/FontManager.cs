@@ -4,33 +4,63 @@ namespace BaseballBiblico.Core;
 
 public static class FontManager
 {
-    public static Font CargarFuenteEspanol(string ruta, int tamano)
+    public static Font CargarFuenteEspanol(
+        string ruta,
+        int tamaño)
     {
-        // Caracteres desde espacio (32) hasta ÿ (255).
-        // Incluye: ¿ ¡ á é í ó ú ñ Á É Í Ó Ú Ñ ü Ü, etc.
-        const int primerCodigo = 32;
-        const int ultimoCodigo = 255;
-
-        int cantidad = ultimoCodigo - primerCodigo + 1;
-        int[] codepoints = new int[cantidad];
-
-        for (int i = 0; i < cantidad; i++)
+        if (!File.Exists(ruta))
         {
-            codepoints[i] = primerCodigo + i;
+            throw new FileNotFoundException(
+                $"No se encontró la fuente: {ruta}"
+            );
         }
+
+        int[] caracteres = CrearCaracteresEspanol();
 
         Font fuente = Raylib.LoadFontEx(
             ruta,
-            tamano,
-            codepoints,
-            codepoints.Length
+            tamaño,
+            caracteres,
+            caracteres.Length
         );
 
-        if (fuente.Texture.Id == 0)
+        if (fuente.Texture.Id <= 0)
         {
-            Console.WriteLine($"ERROR: No se pudo cargar la fuente: {ruta}");
+            throw new InvalidOperationException(
+                $"No se pudo cargar la fuente: {ruta}"
+            );
         }
 
+        Raylib.SetTextureFilter(
+            fuente.Texture,
+            TextureFilter.Bilinear
+        );
+
         return fuente;
+    }
+
+    private static int[] CrearCaracteresEspanol()
+    {
+        List<int> caracteres = new();
+
+        // Caracteres ASCII normales.
+        for (int i = 32; i <= 126; i++)
+        {
+            caracteres.Add(i);
+        }
+
+        // Caracteres utilizados en español.
+        string adicionales =
+            "áéíóúÁÉÍÓÚñÑüÜ¿¡";
+
+        foreach (char caracter in adicionales)
+        {
+            if (!caracteres.Contains(caracter))
+            {
+                caracteres.Add(caracter);
+            }
+        }
+
+        return caracteres.ToArray();
     }
 }
