@@ -2,9 +2,11 @@
 
 try
 {
-    Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+    Directory.SetCurrentDirectory(
+        AppContext.BaseDirectory
+    );
 
-    Game game = new Game();
+    Game game = new();
     game.Run();
 }
 catch (Exception ex)
@@ -14,18 +16,16 @@ catch (Exception ex)
         "error_inicio.txt"
     );
 
+    string contenido =
+        $"Fecha: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n\n" +
+        $"Directorio base:\n{AppContext.BaseDirectory}\n\n" +
+        $"Directorio actual:\n{Directory.GetCurrentDirectory()}\n\n" +
+        $"Tipo: {ex.GetType().FullName}\n\n" +
+        $"Mensaje:\n{ex.Message}\n\n" +
+        $"Detalles:\n{ex}";
+
     File.WriteAllText(
         rutaError,
-        $"""
-        Fecha: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
-
-        Tipo: {ex.GetType().FullName}
-
-        Mensaje:
-        {ex.Message}
-
-        Detalles:
-        {ex}
-        """
+        contenido
     );
 }

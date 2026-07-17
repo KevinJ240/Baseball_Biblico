@@ -1,64 +1,135 @@
 ﻿using Raylib_cs;
+using System.Text;
 
 namespace BaseballBiblico.Core;
 
 public static class FontManager
 {
     public static Font CargarFuenteEspanol(
+        string rutaRelativa,
+        int tamaño)
+    {
+        string rutaPrincipal =
+            ObtenerRutaAbsoluta(rutaRelativa);
+
+        string rutaAlternativa =
+            ObtenerRutaAbsoluta(
+                "Assets/Fonts/ari-bold.ttf"
+            );
+
+        Font fuente = IntentarCargarFuente(
+            rutaPrincipal,
+            tamaño
+        );
+
+        if (FuenteValida(fuente))
+        {
+            ConfigurarFuente(fuente);
+            return fuente;
+        }
+
+        fuente = IntentarCargarFuente(
+            rutaAlternativa,
+            tamaño
+        );
+
+        if (FuenteValida(fuente))
+        {
+            ConfigurarFuente(fuente);
+            return fuente;
+        }
+
+        throw new InvalidOperationException(
+            "No se pudo cargar ninguna fuente del juego.\n\n" +
+            $"Fuente principal:\n{rutaPrincipal}\n\n" +
+            $"Fuente alternativa:\n{rutaAlternativa}\n\n" +
+            "Comprueba que ambos archivos existan, tengan contenido " +
+            "y se encuentren dentro de Assets/Fonts."
+        );
+    }
+
+    private static Font IntentarCargarFuente(
         string ruta,
         int tamaño)
     {
         if (!File.Exists(ruta))
         {
-            throw new FileNotFoundException(
-                $"No se encontró la fuente: {ruta}"
-            );
+            return default;
         }
 
-        int[] caracteres = CrearCaracteresEspanol();
+        FileInfo archivo = new(ruta);
 
-        Font fuente = Raylib.LoadFontEx(
-            ruta,
-            tamaño,
-            caracteres,
-            caracteres.Length
-        );
-
-        if (fuente.Texture.Id <= 0)
+        if (archivo.Length <= 0)
         {
-            throw new InvalidOperationException(
-                $"No se pudo cargar la fuente: {ruta}"
-            );
+            return default;
         }
 
+        int[] caracteres =
+            CrearCaracteresEspanol();
+
+        try
+        {
+            return Raylib.LoadFontEx(
+                ruta,
+                tamaño,
+                caracteres,
+                caracteres.Length
+            );
+        }
+        catch
+        {
+            return default;
+        }
+    }
+
+    private static bool FuenteValida(Font fuente)
+    {
+        return fuente.Texture.Id > 0 &&
+               fuente.GlyphCount > 0;
+    }
+
+    private static void ConfigurarFuente(Font fuente)
+    {
         Raylib.SetTextureFilter(
             fuente.Texture,
             TextureFilter.Bilinear
         );
+    }
 
-        return fuente;
+    private static string ObtenerRutaAbsoluta(
+        string rutaRelativa)
+    {
+        string rutaNormalizada =
+            rutaRelativa.Replace(
+                '/',
+                Path.DirectorySeparatorChar
+            );
+
+        return Path.GetFullPath(
+            Path.Combine(
+                AppContext.BaseDirectory,
+                rutaNormalizada
+            )
+        );
     }
 
     private static int[] CrearCaracteresEspanol()
     {
-        List<int> caracteres = new();
+        HashSet<int> caracteres = new();
 
-        // Caracteres ASCII normales.
-        for (int i = 32; i <= 126; i++)
+        // ASCII imprimible.
+        for (int codigo = 32; codigo <= 126; codigo++)
         {
-            caracteres.Add(i);
+            caracteres.Add(codigo);
         }
 
-        // Caracteres utilizados en español.
+        // Caracteres en español.
         string adicionales =
             "áéíóúÁÉÍÓÚñÑüÜ¿¡";
 
-        foreach (char caracter in adicionales)
+        foreach (Rune rune in adicionales.EnumerateRunes())
         {
-            if (!caracteres.Contains(caracter))
-            {
-                caracteres.Add(caracter);
-            }
+            caracteres.Add(rune.Value);
         }
 
         return caracteres.ToArray();

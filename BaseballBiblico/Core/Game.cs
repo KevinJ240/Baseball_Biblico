@@ -14,7 +14,6 @@ public class Game
     private readonly CreditsScreen creditsScreen;
 
     private RenderTexture2D renderTexture;
-
     private bool recursosDescargados;
 
     public Game()
@@ -27,13 +26,20 @@ public class Game
             TraceLogLevel.Error
         );
 
-        // Esta debe ser la única llamada a InitWindow
-        // en todo el proyecto.
+        // Debe ser la única llamada a InitWindow
+        // dentro de todo el proyecto.
         Raylib.InitWindow(
             ScreenScaler.VirtualWidth,
             ScreenScaler.VirtualHeight,
             "Baseball Bíblico"
         );
+
+        if (!Raylib.IsWindowReady())
+        {
+            throw new InvalidOperationException(
+                "No se pudo inicializar la ventana del juego."
+            );
+        }
 
         Raylib.SetTargetFPS(60);
 
@@ -42,6 +48,27 @@ public class Game
             ScreenScaler.VirtualHeight
         );
 
+        if (renderTexture.Id <= 0)
+        {
+            Raylib.CloseWindow();
+
+            throw new InvalidOperationException(
+                "No se pudo crear la textura de renderizado del juego."
+            );
+        }
+
+        Raylib.SetTextureFilter(
+            renderTexture.Texture,
+            TextureFilter.Bilinear
+        );
+
+        /*
+         * Estas clases deben crearse después de InitWindow,
+         * porque cargan fuentes, imágenes y texturas.
+         *
+         * Se asignan directamente dentro del constructor
+         * porque los campos están declarados como readonly.
+         */
         menuScreen = new MenuScreen();
         gameScreen = new GameScreen();
         optionsScreen = new OptionsScreen();
@@ -52,15 +79,20 @@ public class Game
 
     public void Run()
     {
-        while (!Raylib.WindowShouldClose())
+        try
         {
-            ScreenScaler.Update();
+            while (!Raylib.WindowShouldClose())
+            {
+                ScreenScaler.Update();
 
-            Update();
-            Draw();
+                Update();
+                Draw();
+            }
         }
-
-        Unload();
+        finally
+        {
+            Unload();
+        }
     }
 
     private void Update()
@@ -89,30 +121,28 @@ public class Game
     {
         menuScreen.Update();
 
-        if (menuScreen.NextScreen == GameScreenType.Game)
+        switch (menuScreen.NextScreen)
         {
-            gameScreen.IniciarNuevaPartida();
+            case GameScreenType.Game:
+                gameScreen.IniciarNuevaPartida();
+                menuScreen.Reset();
 
-            menuScreen.Reset();
-            currentScreen = GameScreenType.Game;
-            return;
-        }
+                currentScreen = GameScreenType.Game;
+                break;
 
-        if (menuScreen.NextScreen == GameScreenType.Options)
-        {
-            optionsScreen.Reset();
+            case GameScreenType.Options:
+                optionsScreen.Reset();
+                menuScreen.Reset();
 
-            menuScreen.Reset();
-            currentScreen = GameScreenType.Options;
-            return;
-        }
+                currentScreen = GameScreenType.Options;
+                break;
 
-        if (menuScreen.NextScreen == GameScreenType.Credits)
-        {
-            creditsScreen.Reset();
+            case GameScreenType.Credits:
+                creditsScreen.Reset();
+                menuScreen.Reset();
 
-            menuScreen.Reset();
-            currentScreen = GameScreenType.Credits;
+                currentScreen = GameScreenType.Credits;
+                break;
         }
     }
 
@@ -120,43 +150,56 @@ public class Game
     {
         gameScreen.Update();
 
-        if (gameScreen.NextScreen == GameScreenType.Menu)
+        if (gameScreen.NextScreen != GameScreenType.Menu)
         {
-            menuScreen.Reset();
-            currentScreen = GameScreenType.Menu;
+            return;
         }
+
+        menuScreen.Reset();
+        currentScreen = GameScreenType.Menu;
     }
 
     private void UpdateOptions()
     {
         optionsScreen.Update();
 
-        if (optionsScreen.NextScreen == GameScreenType.Menu)
+        if (optionsScreen.NextScreen != GameScreenType.Menu)
         {
-            optionsScreen.Reset();
-            menuScreen.Reset();
-
-            currentScreen = GameScreenType.Menu;
+            return;
         }
+
+        optionsScreen.Reset();
+        menuScreen.Reset();
+
+        currentScreen = GameScreenType.Menu;
     }
 
     private void UpdateCredits()
     {
         creditsScreen.Update();
 
-        if (creditsScreen.NextScreen == GameScreenType.Menu)
+        if (creditsScreen.NextScreen != GameScreenType.Menu)
         {
-            creditsScreen.Reset();
-            menuScreen.Reset();
-
-            currentScreen = GameScreenType.Menu;
+            return;
         }
+
+        creditsScreen.Reset();
+        menuScreen.Reset();
+
+        currentScreen = GameScreenType.Menu;
     }
 
     private void Draw()
     {
-        // Primero se dibuja en la resolución virtual.
-        Raylib.BeginTextureMode(renderTexture);
+        DrawVirtualScreen();
+        DrawWindow();
+    }
+
+    private void DrawVirtualScreen()
+    {
+        Raylib.BeginTextureMode(
+            renderTexture
+        );
 
         Raylib.ClearBackground(
             new Color(73, 138, 44, 255)
@@ -182,11 +225,15 @@ public class Game
         }
 
         Raylib.EndTextureMode();
+    }
 
-        // Luego se dibuja la textura virtual en la ventana real.
+    private void DrawWindow()
+    {
         Raylib.BeginDrawing();
 
-        Raylib.ClearBackground(Color.Black);
+        Raylib.ClearBackground(
+            Color.Black
+        );
 
         Raylib.DrawTexturePro(
             renderTexture.Texture,
@@ -208,10 +255,16 @@ public class Game
     private void Unload()
     {
         if (recursosDescargados)
+        {
             return;
+        }
 
         recursosDescargados = true;
 
+        /*
+         * Los recursos deben descargarse antes
+         * de cerrar la ventana de Raylib.
+         */
         menuScreen.Unload();
         gameScreen.Unload();
         optionsScreen.Unload();
@@ -224,6 +277,9 @@ public class Game
             );
         }
 
-        Raylib.CloseWindow();
+        if (Raylib.IsWindowReady())
+        {
+            Raylib.CloseWindow();
+        }
     }
 }
